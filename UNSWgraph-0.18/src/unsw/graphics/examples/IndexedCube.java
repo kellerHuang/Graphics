@@ -55,9 +55,9 @@ public class IndexedCube extends Application3D {
         CoordFrame3D frame = CoordFrame3D.identity()
                 .translate(0, 0, -2)
                 .scale(0.5f, 0.5f, 0.5f);
-//        drawCube(gl, frame.rotateY(rotationY));
+        drawCube(gl, frame.rotateY(rotationY));
         
-        cube.draw(gl, frame.rotateY(rotationY));
+//        cube.draw(gl, frame.rotateY(rotationY));
 
         rotationY += 1;
     }

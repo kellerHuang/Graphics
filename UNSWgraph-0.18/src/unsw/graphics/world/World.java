@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import com.jogamp.opengl.GL3;
 
 import unsw.graphics.Application3D;
+import unsw.graphics.CoordFrame3D;
 import unsw.graphics.Matrix4;
 import unsw.graphics.Shader;
 
@@ -23,7 +24,6 @@ public class World extends Application3D {
     public World(Terrain terrain) {
     	super("Assignment 2", 800, 600);
         this.terrain = terrain;
-   
     }
    
     /**
@@ -35,7 +35,8 @@ public class World extends Application3D {
     public static void main(String[] args) throws FileNotFoundException {
         Terrain terrain = LevelIO.load(new File(args[0]));
         World world = new World(terrain);
-        world.start();
+        //world.start();
+        terrain.start();
     }
 
 	@Override

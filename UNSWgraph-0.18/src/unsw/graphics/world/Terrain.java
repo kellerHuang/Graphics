@@ -1,22 +1,22 @@
 package unsw.graphics.world;
 
 
-
 import java.awt.Color;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.util.GLBuffers;
 
-import unsw.graphics.Application3D;
-import unsw.graphics.CoordFrame3D;
-import unsw.graphics.Shader;
-import unsw.graphics.Vector3;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
 import unsw.graphics.geometry.TriangleMesh;
-
+import unsw.graphics.*;
 
 
 /**
@@ -24,7 +24,7 @@ import unsw.graphics.geometry.TriangleMesh;
  *
  * @author malcolmr
  */
-public class Terrain{
+public class Terrain extends Application3D{
 
     private int width;
     private int depth;
@@ -32,6 +32,13 @@ public class Terrain{
     private List<Tree> trees;
     private List<Road> roads;
     private Vector3 sunlight;
+    private Point3DBuffer vertexBuffer;
+    private IntBuffer indicesBuffer;
+    private int verticesName;
+    private int indicesName;
+    private TriangleMesh terrain;
+    private int rotateX;
+    private int rotateY;
 
     /**
      * Create a new terrain
@@ -40,6 +47,7 @@ public class Terrain{
      * @param depth The number of vertices in the z-direction
      */
     public Terrain(int width, int depth, Vector3 sunlight) {
+    	super("Terrain",600,600);
         this.width = width;
         this.depth = depth;
         altitudes = new float[width][depth];
@@ -146,35 +154,42 @@ public class Terrain{
         roads.add(road);        
     }
     
-    public List<Point3D> getVertices() {
+    public void getVertices() {
     	List<Point3D> vertices = new ArrayList<Point3D>();
     	for(int i = 0; i < width;i++) {
     		for(int j = 0; j < depth; j++) {
     			vertices.add(new Point3D(i,j,altitudes[i][j]));
     		}
     	}
-    	return vertices;
+    	vertexBuffer = new Point3DBuffer(vertices);
     }
     
-    public ArrayList<ArrayList<Integer>> getIndices() {
+    public int[] getIndices() {
     	int a = 0;
     	int b = 1;
     	int c = width;
     	int d = width+1;
     	int change = 0;
-    	ArrayList<ArrayList<Integer>> indices = new ArrayList<ArrayList<Integer>>();
+    	int [] indices = new int[(width-1)*(depth-1)*6];
+    	int i = 0;
+    	int even = 0;
     	while(d < depth*width && c < depth*width) {
-    		ArrayList<Integer> x = new ArrayList<Integer>();
-    		ArrayList<Integer> y = new ArrayList<Integer>();
-    		x.add(a);
-    		x.add(b);
-    		x.add(c);
-    		y.add(b);
-    		y.add(c);
-    		y.add(d);
-    		indices.add(x);
-    		indices.add(y);
-    		
+    		if(change == 0) {
+	    		indices[i] = a;
+	    		indices[i+1] = c;
+	    		indices[i+2] = b;
+	    		indices[i+3] = b;
+	    		indices[i+4] = c;
+	    		indices[i+5] = d;
+    		}else{
+	    		indices[i] = a;
+	    		indices[i+1] = b;
+	    		indices[i+2] = d;
+	    		indices[i+3] = a;
+	    		indices[i+4] = d;
+	    		indices[i+5] = c;
+    		}
+    		i = i + 6;
     		//compute new two points
     		//check if it is last square in grid
     		if((a+1)%width == 0 || (b+1)%width == 0) {
@@ -194,6 +209,79 @@ public class Terrain{
     			change = 0;
     		}
     	}
+    	
+    	indicesBuffer = GLBuffers.newDirectIntBuffer(indices);
+		int m = Array.getLength(indices);
+		int counter = 0;
+		for(int j = 0; j < m; j +=3) {
+			System.out.print(indices[j] + " ");
+			System.out.print(indices[j+1] + " ");
+			System.out.println(indices[j+2]);
+			counter++;
+		}
+		System.out.println(counter);
     	return indices;
+    }
+    @Override
+    public void init(GL3 gl) {
+        super.init(gl);
+    	System.out.println("xd");
+        this.getVertices();
+        this.getIndices();
+
+        int[] names = new int[2];
+        gl.glGenBuffers(2, names, 0);
+        
+        verticesName = names[0];
+        indicesName = names[1];
+        
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, verticesName);
+        gl.glBufferData(GL.GL_ARRAY_BUFFER, vertexBuffer.capacity() * 3 * Float.BYTES,
+                vertexBuffer.getBuffer(), GL.GL_STATIC_DRAW);
+       
+        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, indicesName);
+        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer.capacity() * Integer.BYTES,
+                indicesBuffer, GL.GL_STATIC_DRAW);
+        /*
+        try {
+            cube = new TriangleMesh("res/models/cube.ply");
+            cube.init(gl);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+    }
+    @Override
+    public void reshape(GL3 gl, int width, int height) {
+        super.reshape(gl, width, height);
+        Shader.setProjMatrix(gl, Matrix4.perspective(50, 1, 1, 10));
+    }
+    @Override
+    public void display(GL3 gl) {
+        super.display(gl);
+        CoordFrame3D frame = CoordFrame3D.identity()
+                .translate(0, 0, -2)
+                .scale(0.05f, 0.05f, 0.05f);
+        rotateX += 1;
+        rotateY += 1;
+        drawTerrain(gl, frame.rotateX(rotateX).rotateY(rotateY));
+    }
+    
+    @Override
+    public void destroy(GL3 gl) {
+        super.destroy(gl);
+        gl.glDeleteBuffers(2, new int[] { indicesName, verticesName }, 0);
+        terrain.destroy(gl);
+    }
+    
+   	public void drawTerrain(GL3 gl, CoordFrame3D frame) {
+   		//gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, verticesName);
+        gl.glVertexAttribPointer(Shader.POSITION, 3, GL.GL_FLOAT, false, 0, 0);
+        
+        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, indicesName);
+        
+        Shader.setModelMatrix(gl, frame.getMatrix());
+        gl.glDrawElements(GL.GL_TRIANGLES, indicesBuffer.capacity(), 
+                GL.GL_UNSIGNED_INT, 0);
     }
 }
