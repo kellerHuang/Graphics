@@ -2,11 +2,20 @@ package unsw.graphics.world;
 
 
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL3;
+
+import unsw.graphics.Application3D;
+import unsw.graphics.CoordFrame3D;
+import unsw.graphics.Shader;
 import unsw.graphics.Vector3;
 import unsw.graphics.geometry.Point2D;
+import unsw.graphics.geometry.Point3D;
+import unsw.graphics.geometry.TriangleMesh;
 
 
 
@@ -15,7 +24,7 @@ import unsw.graphics.geometry.Point2D;
  *
  * @author malcolmr
  */
-public class Terrain {
+public class Terrain{
 
     private int width;
     private int depth;
@@ -96,9 +105,19 @@ public class Terrain {
      */
     public float altitude(float x, float z) {
         float altitude = 0;
-
-        // TODO: Implement this
+        double a = getGridAltitude((int) x,(int) z);
+        double b = getGridAltitude((int) x,(int) z + 1);
+        double c = getGridAltitude((int) x + 1,(int) z);
+        double d = getGridAltitude((int) x + 1,(int) z + 1);
         
+        float diffx = x - (int) x;
+        float diffz = z - (int) z;
+        double e = diffz/1*b + (1-diffz/1)*a;
+        double f = diffz/1*d + (1-diffz/1)*c;
+        
+        double g = diffx/1*f + (1-diffx/1)*e;
+        
+        altitude = (float) g;
         return altitude;
     }
 
@@ -126,5 +145,55 @@ public class Terrain {
         Road road = new Road(width, spine);
         roads.add(road);        
     }
-
+    
+    public List<Point3D> getVertices() {
+    	List<Point3D> vertices = new ArrayList<Point3D>();
+    	for(int i = 0; i < width;i++) {
+    		for(int j = 0; j < depth; j++) {
+    			vertices.add(new Point3D(i,j,altitudes[i][j]));
+    		}
+    	}
+    	return vertices;
+    }
+    
+    public ArrayList<ArrayList<Integer>> getIndices() {
+    	int a = 0;
+    	int b = 1;
+    	int c = width;
+    	int d = width+1;
+    	int change = 0;
+    	ArrayList<ArrayList<Integer>> indices = new ArrayList<ArrayList<Integer>>();
+    	while(d < depth*width && c < depth*width) {
+    		ArrayList<Integer> x = new ArrayList<Integer>();
+    		ArrayList<Integer> y = new ArrayList<Integer>();
+    		x.add(a);
+    		x.add(b);
+    		x.add(c);
+    		y.add(b);
+    		y.add(c);
+    		y.add(d);
+    		indices.add(x);
+    		indices.add(y);
+    		
+    		//compute new two points
+    		//check if it is last square in grid
+    		if((a+1)%width == 0 || (b+1)%width == 0) {
+    			a = a + 2;
+    			b = b + 2;
+    			c = c + 2;
+    			d = d + 2;
+    			continue;
+    		}
+    		if(change == 0) {
+    			a = a + 2;
+    			c = c + 2;
+    			change = 1;
+    		}else {
+    			b = b + 2;
+    			d = d + 2;
+    			change = 0;
+    		}
+    	}
+    	return indices;
+    }
 }

@@ -29,7 +29,6 @@ public class LevelIO {
      * @throws FileNotFoundException 
      */
     public static Terrain load(File mapFile) throws FileNotFoundException {
-
         Reader in = new FileReader(mapFile);
         JSONTokener jtk = new JSONTokener(in);
         JSONObject jsonTerrain = new JSONObject(jtk);
