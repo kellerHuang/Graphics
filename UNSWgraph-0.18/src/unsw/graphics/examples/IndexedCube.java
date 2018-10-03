@@ -122,12 +122,12 @@ public class IndexedCube extends Application3D {
         gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer.capacity() * Integer.BYTES,
                 indicesBuffer, GL.GL_STATIC_DRAW);
         
-        try {
+        /*try {
             cube = new TriangleMesh("res/models/cube.ply");
             cube.init(gl);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
     
     @Override

@@ -24,7 +24,7 @@ import unsw.graphics.*;
  *
  * @author malcolmr
  */
-public class Terrain extends Application3D{
+public class Terrain{
 
     private int width;
     private int depth;
@@ -39,6 +39,7 @@ public class Terrain extends Application3D{
     private TriangleMesh terrain;
     private int rotateX;
     private int rotateY;
+    private int rotateZ;
 
     /**
      * Create a new terrain
@@ -47,13 +48,13 @@ public class Terrain extends Application3D{
      * @param depth The number of vertices in the z-direction
      */
     public Terrain(int width, int depth, Vector3 sunlight) {
-    	super("Terrain",600,600);
         this.width = width;
         this.depth = depth;
         altitudes = new float[width][depth];
         trees = new ArrayList<Tree>();
         roads = new ArrayList<Road>();
         this.sunlight = sunlight;
+        rotateX = -90;
     }
 
     public List<Tree> trees() {
@@ -222,9 +223,8 @@ public class Terrain extends Application3D{
 		System.out.println(counter);
     	return indices;
     }
-    @Override
-    public void init(GL3 gl) {
-        super.init(gl);
+    
+    public void terrainInit(GL3 gl) {
     	System.out.println("xd");
         this.getVertices();
         this.getIndices();
@@ -250,31 +250,28 @@ public class Terrain extends Application3D{
             e.printStackTrace();
         }*/
     }
-    @Override
-    public void reshape(GL3 gl, int width, int height) {
-        super.reshape(gl, width, height);
+
+    public void terrainReshape(GL3 gl, int width, int height) {
         Shader.setProjMatrix(gl, Matrix4.perspective(50, 1, 1, 10));
     }
-    @Override
-    public void display(GL3 gl) {
-        super.display(gl);
-        CoordFrame3D frame = CoordFrame3D.identity()
-                .translate(0, 0, -2)
-                .scale(0.05f, 0.05f, 0.05f);
-        rotateX += 1;
-        rotateY += 1;
-        drawTerrain(gl, frame.rotateX(rotateX).rotateY(rotateY));
+
+    public void terrainDisplay(GL3 gl,CoordFrame3D frame) {
+        frame = frame
+                .translate(-0.2f, 0, -1)
+                .scale(0.1f, 0.1f, 0.1f);
+//        rotateX += 1; // left right
+//        rotateY += 1; // forwards
+//        rotateZ += 1; // up down
+        drawTerrain(gl, frame.rotateX(rotateX).rotateY(rotateY).rotateZ(rotateZ));
     }
     
-    @Override
-    public void destroy(GL3 gl) {
-        super.destroy(gl);
+    public void terrainDestroy(GL3 gl) {
         gl.glDeleteBuffers(2, new int[] { indicesName, verticesName }, 0);
         terrain.destroy(gl);
     }
     
    	public void drawTerrain(GL3 gl, CoordFrame3D frame) {
-   		//gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
+   		gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, verticesName);
         gl.glVertexAttribPointer(Shader.POSITION, 3, GL.GL_FLOAT, false, 0, 0);
         

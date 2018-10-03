@@ -38,7 +38,7 @@ public class PersonDemo extends Application2D implements KeyListener {
         super("Person", 600, 600);
         person = new Person(0, 0, 0, 1);
         camera = new Camera();
-        useCamera = false;
+        useCamera = true;
     }
 
     public static void main(String[] args) {
