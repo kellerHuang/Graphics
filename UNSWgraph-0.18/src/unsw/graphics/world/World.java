@@ -30,7 +30,7 @@ public class World extends Application3D implements KeyListener{
     public World(Terrain terrain) {
     	super("Assignment 2", 800, 600);
         this.terrain = terrain;
-        camera = new Camera();
+        camera = new Camera(terrain);
         myAngle = 0;
         myPos = new Point3D(0,0,0);
     }

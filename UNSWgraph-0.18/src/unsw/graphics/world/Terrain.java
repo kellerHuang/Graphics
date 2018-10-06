@@ -54,7 +54,6 @@ public class Terrain{
         trees = new ArrayList<Tree>();
         roads = new ArrayList<Road>();
         this.sunlight = sunlight;
-        rotateX = -90;
     }
 
     public List<Tree> trees() {
@@ -113,6 +112,9 @@ public class Terrain{
      * @return
      */
     public float altitude(float x, float z) {
+    	if(x < 0 || x+1 >= width || z < 0 || z+1 >= depth) {
+    		return 0;
+    	}
         float altitude = 0;
         double a = getGridAltitude((int) x,(int) z);
         double b = getGridAltitude((int) x,(int) z + 1);
@@ -159,13 +161,13 @@ public class Terrain{
     	List<Point3D> vertices = new ArrayList<Point3D>();
     	for(int i = 0; i < width;i++) {
     		for(int j = 0; j < depth; j++) {
-    			vertices.add(new Point3D(i,j,altitudes[i][j]));
+    			vertices.add(new Point3D(i,altitudes[i][j],j));
     		}
     	}
     	vertexBuffer = new Point3DBuffer(vertices);
     }
     
-    public int[] getIndices() {
+    public void getIndices() {
     	int a = 0;
     	int b = 1;
     	int c = width;
@@ -176,19 +178,19 @@ public class Terrain{
     	int even = 0;
     	while(d < depth*width && c < depth*width) {
     		if(change == 0) {
-	    		indices[i] = a;
+	    		indices[i] = b;
 	    		indices[i+1] = c;
-	    		indices[i+2] = b;
-	    		indices[i+3] = b;
+	    		indices[i+2] = a;
+	    		indices[i+3] = d;
 	    		indices[i+4] = c;
-	    		indices[i+5] = d;
+	    		indices[i+5] = b;
     		}else{
-	    		indices[i] = a;
+	    		indices[i] = d;
 	    		indices[i+1] = b;
-	    		indices[i+2] = d;
-	    		indices[i+3] = a;
+	    		indices[i+2] = a;
+	    		indices[i+3] = c;
 	    		indices[i+4] = d;
-	    		indices[i+5] = c;
+	    		indices[i+5] = a;
     		}
     		i = i + 6;
     		//compute new two points
@@ -212,20 +214,19 @@ public class Terrain{
     	}
     	
     	indicesBuffer = GLBuffers.newDirectIntBuffer(indices);
-		int m = Array.getLength(indices);
-		int counter = 0;
-		for(int j = 0; j < m; j +=3) {
-			System.out.print(indices[j] + " ");
-			System.out.print(indices[j+1] + " ");
-			System.out.println(indices[j+2]);
-			counter++;
-		}
-		System.out.println(counter);
-    	return indices;
+//		int m = Array.getLength(indices);
+//		int counter = 0;
+//		for(int j = 0; j < m; j +=3) {
+//			System.out.print(indices[j] + " ");
+//			System.out.print(indices[j+1] + " ");
+//			System.out.println(indices[j+2]);
+//			counter++;
+//		}
+//		System.out.println(counter);
+//    	return indices;
     }
     
     public void terrainInit(GL3 gl) {
-    	System.out.println("xd");
         this.getVertices();
         this.getIndices();
 
@@ -242,26 +243,18 @@ public class Terrain{
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, indicesName);
         gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer.capacity() * Integer.BYTES,
                 indicesBuffer, GL.GL_STATIC_DRAW);
-        /*
-        try {
-            cube = new TriangleMesh("res/models/cube.ply");
-            cube.init(gl);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public void terrainReshape(GL3 gl, int width, int height) {
-        Shader.setProjMatrix(gl, Matrix4.perspective(50, 1, 1, 10));
+        //Shader.setProjMatrix(gl, Matrix4.perspective(50, 1, 1, 10));
     }
 
     public void terrainDisplay(GL3 gl,CoordFrame3D frame) {
-        frame = frame
-                .translate(-0.2f, 0, -1)
-                .scale(0.1f, 0.1f, 0.1f);
-//        rotateX += 1; // left right
-//        rotateY += 1; // forwards
-//        rotateZ += 1; // up down
+        frame = frame;
+        //        .scale(0.1f, 0.1f, 0.1f);
+        //rotateX += 1; // left right
+        //rotateY += 1; // forwards
+        //rotateZ += 1; // up down
         drawTerrain(gl, frame.rotateX(rotateX).rotateY(rotateY).rotateZ(rotateZ));
     }
     
@@ -271,7 +264,7 @@ public class Terrain{
     }
     
    	public void drawTerrain(GL3 gl, CoordFrame3D frame) {
-   		gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
+   		//gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, verticesName);
         gl.glVertexAttribPointer(Shader.POSITION, 3, GL.GL_FLOAT, false, 0, 0);
         

@@ -25,11 +25,12 @@ public class Camera implements KeyListener {
     private Point3D myPos;
     private float myAngle;
     private float myScale;
-
-    public Camera() {
-        myPos = new Point3D(0, 0,1);
+    private Terrain terrain;
+    public Camera(Terrain terrain) {
+        myPos = new Point3D(0, 0,0);
         myAngle = 0;
         myScale = 1f;
+        this.terrain = terrain;
     }
     
     public void draw(GL3 gl, CoordFrame3D frame) {
@@ -60,18 +61,20 @@ public class Camera implements KeyListener {
         switch(e.getKeyCode()) {
         case KeyEvent.VK_LEFT:
         	System.out.println("left");
-        	myAngle -=10;
+        	myAngle -=30;
         	break;
         case KeyEvent.VK_RIGHT:
            	System.out.println("right");
-        	myAngle += 10; 
+        	myAngle += 30; 
         	break;
         case KeyEvent.VK_DOWN:
         	System.out.println("down");
         	x = (float)Math.sin(Math.toRadians(myAngle));
         	y = (float)Math.cos(Math.toRadians(myAngle));
         	myPos = myPos.translate(-x,0,y);
+        	myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY(), 0);
         	System.out.println(myAngle);
+        	System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
         	System.out.println(myPos.getX());
         	System.out.println(myPos.getY());
         	System.out.println(myPos.getZ());
@@ -81,7 +84,9 @@ public class Camera implements KeyListener {
         	x = (float)Math.sin(Math.toRadians(myAngle));
         	y = (float)Math.cos(Math.toRadians(myAngle));
         	myPos = myPos.translate(x,0,-y);
+        	myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY(), 0);
         	System.out.println(myAngle);
+        	System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
         	System.out.println(myPos.getX());
         	System.out.println(myPos.getY());
         	System.out.println(myPos.getZ());
