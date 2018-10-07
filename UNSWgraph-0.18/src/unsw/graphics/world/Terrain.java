@@ -139,7 +139,7 @@ public class Terrain{
      * @param x
      * @param z
      */
-    public void addTree(float x, float z) {
+    public void addTree(float x, float z) throws IOException {
         float y = altitude(x, z);
         Tree tree = new Tree(x, y, z);
         trees.add(tree);

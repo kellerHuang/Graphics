@@ -2,6 +2,7 @@ package unsw.graphics.world;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import com.jogamp.opengl.GL3;
 
@@ -41,7 +42,7 @@ public class World extends Application3D implements KeyListener{
      * @param args - The first argument is a level file in JSON format
      * @throws FileNotFoundException
      */
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
         Terrain terrain = LevelIO.load(new File(args[0]));
         World world = new World(terrain);
         world.start();
