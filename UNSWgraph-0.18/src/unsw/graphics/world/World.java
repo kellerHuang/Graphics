@@ -21,7 +21,7 @@ import com.jogamp.newt.event.KeyListener;
  *
  * @author malcolmr
  */
-public class World extends Application3D implements KeyListener{
+public class World extends Application3D{
 
     private Terrain terrain;
     private Camera camera;
@@ -72,28 +72,9 @@ public class World extends Application3D implements KeyListener{
 	@Override
 	public void reshape(GL3 gl, int width, int height) {
         super.reshape(gl, width, height);
-        Shader.setProjMatrix(gl, Matrix4.perspective(60, width/(float)height, 1, 100));
+        Shader.setProjMatrix(gl, Matrix4.perspective(60, width/(float)height, 0.01f, 100));
         terrain.terrainReshape(gl, width, height);
 	}
 	
-    @Override
-    public void keyPressed(KeyEvent e) {
-        switch(e.getKeyCode()) {
-        case KeyEvent.VK_LEFT:
-        	myAngle -=5;
-            
-        case KeyEvent.VK_RIGHT:
-        	myAngle += 5;
 
-        case KeyEvent.VK_DOWN:
-
-
-        case KeyEvent.VK_UP:
-
-        }
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {}
 }

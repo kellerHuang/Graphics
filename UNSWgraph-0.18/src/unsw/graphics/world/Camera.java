@@ -69,8 +69,8 @@ public class Camera implements KeyListener {
         	break;
         case KeyEvent.VK_DOWN:
         	System.out.println("down");
-        	x = (float)Math.sin(Math.toRadians(myAngle));
-        	y = (float)Math.cos(Math.toRadians(myAngle));
+        	x = (float)Math.sin(Math.toRadians(myAngle))/5;
+        	y = (float)Math.cos(Math.toRadians(myAngle))/5;
         	myPos = myPos.translate(-x,0,y);
         	myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY(), 0);
         	System.out.println(myAngle);
@@ -81,8 +81,8 @@ public class Camera implements KeyListener {
         	break;
         case KeyEvent.VK_UP:
         	System.out.println("up");
-        	x = (float)Math.sin(Math.toRadians(myAngle));
-        	y = (float)Math.cos(Math.toRadians(myAngle));
+        	x = (float)Math.sin(Math.toRadians(myAngle))/5;
+        	y = (float)Math.cos(Math.toRadians(myAngle))/5;
         	myPos = myPos.translate(x,0,-y);
         	myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY(), 0);
         	System.out.println(myAngle);
