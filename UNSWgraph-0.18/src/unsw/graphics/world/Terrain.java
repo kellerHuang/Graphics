@@ -40,6 +40,7 @@ public class Terrain{
     private int rotateX;
     private int rotateY;
     private int rotateZ;
+    private Texture texture;
 
     /**
      * Create a new terrain
@@ -78,7 +79,7 @@ public class Terrain{
      * @param dz
      */
     public void setSunlightDir(float dx, float dy, float dz) {
-        sunlight = new Vector3(dx, dy, dz);      
+        sunlight = new Vector3(dx, dy, dz);
     }
 
     /**
@@ -225,7 +226,7 @@ public class Terrain{
 //		System.out.println(counter);
 //    	return indices;
     }
-    
+
     public void terrainInit(GL3 gl) {
         this.getVertices();
         this.getIndices();
@@ -235,11 +236,15 @@ public class Terrain{
         
         verticesName = names[0];
         indicesName = names[1];
-        
+
+        texture = new Texture(gl, "res/textures/grass.bmp", "bmp", false);
+        Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
+        shader.use(gl);
+
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, verticesName);
         gl.glBufferData(GL.GL_ARRAY_BUFFER, vertexBuffer.capacity() * 3 * Float.BYTES,
                 vertexBuffer.getBuffer(), GL.GL_STATIC_DRAW);
-       
+
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, indicesName);
         gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer.capacity() * Integer.BYTES,
                 indicesBuffer, GL.GL_STATIC_DRAW);
@@ -265,9 +270,24 @@ public class Terrain{
         gl.glDeleteBuffers(2, new int[] { indicesName, verticesName }, 0);
         terrain.destroy(gl);
     }
-    
-   	public void drawTerrain(GL3 gl, CoordFrame3D frame) {
-   		//	gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
+
+    public void drawTerrain(GL3 gl, CoordFrame3D frame) {
+        //	gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
+
+        Shader.setInt (gl, "tex", 0);
+        gl.glActiveTexture(GL.GL_TEXTURE0);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
+        Shader.setPenColor(gl, Color.WHITE);
+        
+        Shader.setPoint3D(gl, "lightPos", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
+        Shader.setColor(gl, "lightIntensity", Color.WHITE);
+        Shader.setColor(gl, "ambientIntensity", new Color(0.75f, 0.75f, 0.75f));
+
+        Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+        Shader.setColor(gl, "diffuseCoeff", new Color(0.8f, 0.8f, 0.8f));
+        Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
+        Shader.setFloat(gl, "phongExp", 4f);
+
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, verticesName);
         gl.glVertexAttribPointer(Shader.POSITION, 3, GL.GL_FLOAT, false, 0, 0);
         
