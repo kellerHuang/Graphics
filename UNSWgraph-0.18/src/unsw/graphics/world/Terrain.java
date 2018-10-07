@@ -243,6 +243,9 @@ public class Terrain{
         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, indicesName);
         gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer.capacity() * Integer.BYTES,
                 indicesBuffer, GL.GL_STATIC_DRAW);
+        for (Tree tree : trees) {
+            tree.init(gl);
+        }
     }
 
     public void terrainReshape(GL3 gl, int width, int height) {
