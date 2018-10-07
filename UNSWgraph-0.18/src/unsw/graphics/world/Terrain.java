@@ -54,6 +54,7 @@ public class Terrain{
         altitudes = new float[width][depth];
         trees = new ArrayList<Tree>();
         roads = new ArrayList<Road>();
+        terrain = new TriangleMesh(getVertices(), getIndices(), true);
         this.sunlight = sunlight;
     }
 
@@ -158,17 +159,17 @@ public class Terrain{
         roads.add(road);        
     }
     
-    public void getVertices() {
+    public List<Point3D> getVertices() {
     	List<Point3D> vertices = new ArrayList<Point3D>();
     	for(int i = 0; i < width;i++) {
     		for(int j = 0; j < depth; j++) {
     			vertices.add(new Point3D(i,altitudes[i][j],j));
     		}
     	}
-    	vertexBuffer = new Point3DBuffer(vertices);
+    	return vertices;
     }
     
-    public void getIndices() {
+    public List<Integer> getIndices() {
     	int a = 0;
     	int b = 1;
     	int c = width;
@@ -214,88 +215,45 @@ public class Terrain{
     		}
     	}
     	
-    	indicesBuffer = GLBuffers.newDirectIntBuffer(indices);
-//		int m = Array.getLength(indices);
-//		int counter = 0;
-//		for(int j = 0; j < m; j +=3) {
-//			System.out.print(indices[j] + " ");
-//			System.out.print(indices[j+1] + " ");
-//			System.out.println(indices[j+2]);
-//			counter++;
-//		}
-//		System.out.println(counter);
-//    	return indices;
+        List<Integer> indicesList = new ArrayList<Integer>();
+    	for (int z : indices)
+    	{
+    	    indicesList.add(z);
+    	}
+    	return indicesList;
     }
-
-    public void terrainInit(GL3 gl) {
-        this.getVertices();
-        this.getIndices();
-
-        int[] names = new int[2];
-        gl.glGenBuffers(2, names, 0);
-        
-        verticesName = names[0];
-        indicesName = names[1];
-
-        texture = new Texture(gl, "res/textures/grass.bmp", "bmp", false);
-        Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
-        shader.use(gl);
-
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, verticesName);
-        gl.glBufferData(GL.GL_ARRAY_BUFFER, vertexBuffer.capacity() * 3 * Float.BYTES,
-                vertexBuffer.getBuffer(), GL.GL_STATIC_DRAW);
-
-        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, indicesName);
-        gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer.capacity() * Integer.BYTES,
-                indicesBuffer, GL.GL_STATIC_DRAW);
+    public List<Vector3> getNormals(){
+    	List<Vector3> normals = new ArrayList<Vector3>();
+    	return normals;
+    }
+    
+    public void init(GL3 gl) {
+        terrain = new TriangleMesh(getVertices(),getIndices(),true);
+        terrain.init(gl);
+        texture = new Texture(gl, "res/textures/rock.bmp", "bmp", false);
         for (Tree tree : trees) {
             tree.init(gl);
         }
     }
 
-    public void terrainReshape(GL3 gl, int width, int height) {
-        //Shader.setProjMatrix(gl, Matrix4.perspective(50, 1, 1, 10));
-    }
-
-    public void terrainDisplay(GL3 gl,CoordFrame3D frame) {
-        frame = frame.translate(0,-2,0);
-        //        .scale(0.1f, 0.1f, 0.1f);
-        //rotateX += 1; // left right
-        //rotateY += 1; // forwards
-        //rotateZ += 1; // up down
-        drawTerrain(gl, frame.rotateX(rotateX).rotateY(rotateY).rotateZ(rotateZ));
+    public void display(GL3 gl) {
+        CoordFrame3D frame = CoordFrame3D.identity().translate(0,-2,0);
+        Shader.setInt (gl, "tex", 0);
+        gl.glActiveTexture(GL.GL_TEXTURE0);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
+        Shader.setPenColor(gl, Color.BLACK);
+        terrain.draw(gl, frame);
     }
     
-    public void terrainDestroy(GL3 gl) {
-        gl.glDeleteBuffers(2, new int[] { indicesName, verticesName }, 0);
+    public void destroy(GL3 gl) {
         terrain.destroy(gl);
+        texture.destroy(gl);
     }
 
     public void drawTerrain(GL3 gl, CoordFrame3D frame) {
         //	gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
 
-        Shader.setInt (gl, "tex", 0);
-        gl.glActiveTexture(GL.GL_TEXTURE0);
-        gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
-        Shader.setPenColor(gl, Color.WHITE);
-        
-        Shader.setPoint3D(gl, "lightPos", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
-        Shader.setColor(gl, "lightIntensity", Color.WHITE);
-        Shader.setColor(gl, "ambientIntensity", new Color(0.75f, 0.75f, 0.75f));
-
-        Shader.setColor(gl, "ambientCoeff", Color.WHITE);
-        Shader.setColor(gl, "diffuseCoeff", new Color(0.8f, 0.8f, 0.8f));
-        Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
-        Shader.setFloat(gl, "phongExp", 4f);
-
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, verticesName);
-        gl.glVertexAttribPointer(Shader.POSITION, 3, GL.GL_FLOAT, false, 0, 0);
-        
-        gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, indicesName);
-        
-        Shader.setModelMatrix(gl, frame.getMatrix());
-        gl.glDrawElements(GL.GL_TRIANGLES, indicesBuffer.capacity(), 
-                GL.GL_UNSIGNED_INT, 0);
+    	display(gl);
 
         for (Tree tree : trees) {
             tree.display(gl);

@@ -1,5 +1,6 @@
 package unsw.graphics.world;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -52,13 +53,13 @@ public class World extends Application3D{
 	public void display(GL3 gl) {
 		super.display(gl);
 		camera.setView(gl);
-		terrain.terrainDisplay(gl,CoordFrame3D.identity());
+		terrain.drawTerrain(gl,CoordFrame3D.identity());
 	}
 
 	@Override
 	public void destroy(GL3 gl) {
 		super.destroy(gl);
-		terrain.terrainDestroy(gl);
+		terrain.destroy(gl);
 		
 	}
 
@@ -66,14 +67,24 @@ public class World extends Application3D{
 	public void init(GL3 gl) {
 		super.init(gl);
         getWindow().addKeyListener(camera);
-		terrain.terrainInit(gl);
+//	    Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
+//	    shader.use(gl);
+//	    // Test light
+//	    Shader.setPoint3D(gl, "lightPos", new Point3D(0, 0, 5));
+//	    Shader.setColor(gl, "lightIntensity", Color.WHITE);
+//	    Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
+//	
+//	    Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+//	    Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+//	    Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
+//	    Shader.setFloat(gl, "phongExp", 16f);
+		terrain.init(gl);
 	}
 
 	@Override
 	public void reshape(GL3 gl, int width, int height) {
         super.reshape(gl, width, height);
         Shader.setProjMatrix(gl, Matrix4.perspective(60, width/(float)height, 0.01f, 100));
-        terrain.terrainReshape(gl, width, height);
 	}
 	
 

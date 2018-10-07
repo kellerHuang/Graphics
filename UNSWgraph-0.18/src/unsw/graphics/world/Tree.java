@@ -35,8 +35,8 @@ public class Tree {
     public void init(GL3 gl) {
         model.init(gl);
         texture = new Texture(gl, "res/textures/rock.bmp", "bmp", false);
-        Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
-        shader.use(gl);
+//        Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
+//        shader.use(gl);
     }
 
 
@@ -46,15 +46,15 @@ public class Tree {
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
         Shader.setPenColor(gl, Color.GREEN);
 
-        // Test light
-        Shader.setPoint3D(gl, "lightPos", new Point3D(0, 0, 5));
-        Shader.setColor(gl, "lightIntensity", Color.WHITE);
-        Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
-
-        Shader.setColor(gl, "ambientCoeff", Color.WHITE);
-        Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
-        Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
-        Shader.setFloat(gl, "phongExp", 16f);
+//        // Test light
+//        Shader.setPoint3D(gl, "lightPos", new Point3D(0, 0, 5));
+//        Shader.setColor(gl, "lightIntensity", Color.WHITE);
+//        Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
+//
+//        Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+//        Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+//        Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
+//        Shader.setFloat(gl, "phongExp", 16f);
 
         CoordFrame3D frame = CoordFrame3D.identity();
 
