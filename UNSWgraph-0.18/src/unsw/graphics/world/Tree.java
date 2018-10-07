@@ -29,7 +29,7 @@ public class Tree extends Application3D {
     
     public Tree(float x, float y, float z) throws IOException {
         super("Tree", 600,600);
-        model = new TriangleMesh("res/models/tree.ply", true, true);
+        model = new TriangleMesh("C:\\Users\\Evan\\Desktop\\Graphics2\\UNSWgraph-0.18\\src\\res\\models\\tree.ply", true, true);
         position = new Point3D(x, y, z);
     }
 
@@ -40,6 +40,12 @@ public class Tree extends Application3D {
         texture = new Texture(gl, "res/textures/rock.bmp", "bmp", false);
         Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
         shader.use(gl);
+    }
+
+    @Override
+    public void reshape(GL3 gl, int width, int height) {
+        super.reshape(gl, width, height);
+        Shader.setProjMatrix(gl, Matrix4.perspective(45, 1, 1, 100));
     }
 
     @Override

@@ -273,5 +273,10 @@ public class Terrain{
         Shader.setModelMatrix(gl, frame.getMatrix());
         gl.glDrawElements(GL.GL_TRIANGLES, indicesBuffer.capacity(), 
                 GL.GL_UNSIGNED_INT, 0);
+
+        for (Tree tree : trees) {
+            tree.display(gl);
+        }
+
     }
 }
