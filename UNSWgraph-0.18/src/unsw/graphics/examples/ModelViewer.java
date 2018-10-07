@@ -32,9 +32,9 @@ public class ModelViewer extends Application3D {
 
     private static final boolean USE_LIGHTING = true;
     
-    private static final boolean USE_TEXTURE = true;
+    private static final boolean USE_TEXTURE = false;
     
-    private static final boolean USE_CUBEMAP = false; //Lighting must also be on
+    private static final boolean USE_CUBEMAP = true; //Lighting must also be on
 
     private float rotateY;
 
@@ -134,7 +134,7 @@ public class ModelViewer extends Application3D {
             Shader.setColor(gl, "ambientIntensity", new Color(0.2f, 0.2f, 0.2f));
             
             // Set the material properties
-            Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+            Shader.setColor(gl, "ambientCoeff", Color.WHITE); 
             Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
             Shader.setColor(gl, "specularCoeff", new Color(0.8f, 0.8f, 0.8f));
             Shader.setFloat(gl, "phongExp", 16f);

@@ -27,7 +27,7 @@ public class Camera implements KeyListener {
     private float myScale;
     private Terrain terrain;
     public Camera(Terrain terrain) {
-        myPos = new Point3D(0, 0,0);
+        myPos = new Point3D(0, 0,20);
         myAngle = 0;
         myScale = 1f;
         this.terrain = terrain;

@@ -264,7 +264,7 @@ public class Terrain{
     }
     
    	public void drawTerrain(GL3 gl, CoordFrame3D frame) {
-   		//gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
+   		//	gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, verticesName);
         gl.glVertexAttribPointer(Shader.POSITION, 3, GL.GL_FLOAT, false, 0, 0);
         
