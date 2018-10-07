@@ -1,9 +1,6 @@
 package unsw.graphics.world;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +25,7 @@ public class LevelIO {
      * @return
      * @throws FileNotFoundException 
      */
-    public static Terrain load(File mapFile) throws FileNotFoundException {
+    public static Terrain load(File mapFile) throws IOException {
         Reader in = new FileReader(mapFile);
         JSONTokener jtk = new JSONTokener(in);
         JSONObject jsonTerrain = new JSONObject(jtk);
