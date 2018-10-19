@@ -260,6 +260,8 @@ public class Terrain{
         Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
         shader.use(gl);
 
+        
+
         for (Tree tree : trees) {
             tree.init(gl);
         }
