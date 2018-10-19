@@ -13,7 +13,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
-//import sun.font.TrueTypeFont;
+import sun.font.TrueTypeFont;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
 import unsw.graphics.geometry.TriangleMesh;
@@ -155,7 +155,7 @@ public class Terrain{
      * @param
      */
     public void addRoad(float width, List<Point2D> spine) {
-        Road road = new Road(width, spine);
+        Road road = new Road(width, spine, altitude(spine.get(0).getX(),spine.get(0).getY()));
         roads.add(road);
     }
 
@@ -260,10 +260,11 @@ public class Terrain{
         Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
         shader.use(gl);
 
-        
-
         for (Tree tree : trees) {
             tree.init(gl);
+        }
+        for (Road road: roads) {
+            road.init(gl);
         }
     }
 
@@ -310,6 +311,8 @@ public class Terrain{
         for (Tree tree : trees) {
             tree.display(gl);
         }
-
+        for (Road road : roads) {
+            road.display(gl);
+        }
     }
 }
