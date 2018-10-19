@@ -13,6 +13,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
+import sun.font.TrueTypeFont;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
 import unsw.graphics.geometry.TriangleMesh;
@@ -20,7 +21,7 @@ import unsw.graphics.*;
 
 
 /**
- * COMMENT: Comment HeightMap 
+ * COMMENT: Comment HeightMap
  *
  * @author malcolmr
  */
@@ -54,7 +55,6 @@ public class Terrain{
         altitudes = new float[width][depth];
         trees = new ArrayList<Tree>();
         roads = new ArrayList<Road>();
-        terrain = new TriangleMesh(getVertices(), getIndices(), true);
         this.sunlight = sunlight;
     }
 
@@ -71,10 +71,10 @@ public class Terrain{
     }
 
     /**
-     * Set the sunlight direction. 
-     * 
+     * Set the sunlight direction.
+     *
      * Note: the sun should be treated as a directional light, without a position
-     * 
+     *
      * @param dx
      * @param dy
      * @param dz
@@ -85,7 +85,7 @@ public class Terrain{
 
     /**
      * Get the altitude at a grid point
-     * 
+     *
      * @param x
      * @param z
      * @return
@@ -96,7 +96,7 @@ public class Terrain{
 
     /**
      * Set the altitude at a grid point
-     * 
+     *
      * @param x
      * @param z
      * @return
@@ -106,38 +106,38 @@ public class Terrain{
     }
 
     /**
-     * Get the altitude at an arbitrary point. 
+     * Get the altitude at an arbitrary point.
      * Non-integer points should be interpolated from neighbouring grid points
-     * 
+     *
      * @param x
      * @param z
      * @return
      */
     public float altitude(float x, float z) {
-    	if(x < 0 || x+1 >= width || z < 0 || z+1 >= depth) {
-    		return 0;
-    	}
+        if(x < 0 || x+1 >= width || z < 0 || z+1 >= depth) {
+            return 0;
+        }
         float altitude = 0;
         double a = getGridAltitude((int) x,(int) z);
         double b = getGridAltitude((int) x,(int) z + 1);
         double c = getGridAltitude((int) x + 1,(int) z);
         double d = getGridAltitude((int) x + 1,(int) z + 1);
-        
+
         float diffx = x - (int) x;
         float diffz = z - (int) z;
         double e = diffz/1*b + (1-diffz/1)*a;
         double f = diffz/1*d + (1-diffz/1)*c;
-        
+
         double g = diffx/1*f + (1-diffx/1)*e;
-        
+
         altitude = (float) g;
         return altitude;
     }
 
     /**
-     * Add a tree at the specified (x,z) point. 
+     * Add a tree at the specified (x,z) point.
      * The tree's y coordinate is calculated from the altitude of the terrain at that point.
-     * 
+     *
      * @param x
      * @param z
      */
@@ -149,112 +149,147 @@ public class Terrain{
 
 
     /**
-     * Add a road. 
-     * 
-     * @param x
-     * @param z
+     * Add a road.
+     *
+     * @param
+     * @param
      */
     public void addRoad(float width, List<Point2D> spine) {
         Road road = new Road(width, spine);
-        roads.add(road);        
+        roads.add(road);
     }
-    
+
     public List<Point3D> getVertices() {
-    	List<Point3D> vertices = new ArrayList<Point3D>();
-    	for(int i = 0; i < width;i++) {
-    		for(int j = 0; j < depth; j++) {
-    			vertices.add(new Point3D(i,altitudes[i][j],j));
-    		}
-    	}
-    	return vertices;
+        List<Point3D> vertices = new ArrayList<Point3D>();
+        for(int i = 0; i < width;i++) {
+            for(int j = 0; j < depth; j++) {
+                vertices.add(new Point3D(i,altitudes[i][j],j));
+            }
+        }
+        return vertices;
     }
-    
+
     public List<Integer> getIndices() {
-    	int a = 0;
-    	int b = 1;
-    	int c = width;
-    	int d = width+1;
-    	int change = 0;
-    	int [] indices = new int[(width-1)*(depth-1)*6];
-    	int i = 0;
-    	int even = 0;
-    	while(d < depth*width && c < depth*width) {
-    		if(change == 0) {
-	    		indices[i] = b;
-	    		indices[i+1] = c;
-	    		indices[i+2] = a;
-	    		indices[i+3] = d;
-	    		indices[i+4] = c;
-	    		indices[i+5] = b;
-    		}else{
-	    		indices[i] = d;
-	    		indices[i+1] = b;
-	    		indices[i+2] = a;
-	    		indices[i+3] = c;
-	    		indices[i+4] = d;
-	    		indices[i+5] = a;
-    		}
-    		i = i + 6;
-    		//compute new two points
-    		//check if it is last square in grid
-    		if((a+1)%width == 0 || (b+1)%width == 0) {
-    			a = a + 2;
-    			b = b + 2;
-    			c = c + 2;
-    			d = d + 2;
-    			continue;
-    		}
-    		if(change == 0) {
-    			a = a + 2;
-    			c = c + 2;
-    			change = 1;
-    		}else {
-    			b = b + 2;
-    			d = d + 2;
-    			change = 0;
-    		}
-    	}
-    	
-        List<Integer> indicesList = new ArrayList<Integer>();
-    	for (int z : indices)
-    	{
-    	    indicesList.add(z);
-    	}
-    	return indicesList;
+        int a = 0;
+        int b = 1;
+        int c = width;
+        int d = width+1;
+        int change = 0;
+        int [] indices = new int[(width-1)*(depth-1)*6];
+        List<Integer> intList = new ArrayList<Integer>();
+        int i = 0;
+        int even = 0;
+        while(d < depth*width && c < depth*width) {
+            if(change == 0) {
+                indices[i] = b;
+                indices[i+1] = c;
+                indices[i+2] = a;
+                indices[i+3] = d;
+                indices[i+4] = c;
+                indices[i+5] = b;
+            }else{
+                indices[i] = d;
+                indices[i+1] = b;
+                indices[i+2] = a;
+                indices[i+3] = c;
+                indices[i+4] = d;
+                indices[i+5] = a;
+            }
+            i = i + 6;
+            //compute new two points
+            //check if it is last square in grid
+            if((a+1)%width == 0 || (b+1)%width == 0) {
+                a = a + 2;
+                b = b + 2;
+                c = c + 2;
+                d = d + 2;
+                continue;
+            }
+            if(change == 0) {
+                a = a + 2;
+                c = c + 2;
+                change = 1;
+            }else {
+                b = b + 2;
+                d = d + 2;
+                change = 0;
+            }
+        }
+        for(int m : indices){
+            intList.add(m);
+        }
+        return intList;
+
+//		int m = Array.getLength(indices);
+//		int counter = 0;
+//		for(int j = 0; j < m; j +=3) {
+//			System.out.print(indices[j] + " ");
+//			System.out.print(indices[j+1] + " ");
+//			System.out.println(indices[j+2]);
+//			counter++;
+//		}
+//		System.out.println(counter);
+//    	return indices;
     }
-    public List<Vector3> getNormals(){
-    	List<Vector3> normals = new ArrayList<Vector3>();
-    	return normals;
-    }
-    
-    public void init(GL3 gl) {
-        terrain = new TriangleMesh(getVertices(),getIndices(),true);
-        terrain.init(gl);
-        texture = new Texture(gl, "res/textures/rock.bmp", "bmp", false);
+
+    public void terrainInit(GL3 gl) {
+        terrain = new TriangleMesh(getVertices(),getIndices(), true);
+
+//        int[] names = new int[2];
+//        gl.glGenBuffers(2, names, 0);
+
+        //verticesName = names[0];
+        //indicesName = names[1];
+
+        texture = new Texture(gl, "res/textures/grass.bmp", "bmp", false);
+        Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
+        shader.use(gl);
+
         for (Tree tree : trees) {
             tree.init(gl);
         }
     }
 
-    public void display(GL3 gl) {
-        CoordFrame3D frame = CoordFrame3D.identity().translate(0,-2,0);
-        Shader.setInt (gl, "tex", 0);
-        gl.glActiveTexture(GL.GL_TEXTURE0);
-        gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
-        Shader.setPenColor(gl, Color.BLACK);
-        terrain.draw(gl, frame);
+    public void terrainReshape(GL3 gl, int width, int height) {
+        //Shader.setProjMatrix(gl, Matrix4.perspective(50, 1, 1, 10));
     }
-    
-    public void destroy(GL3 gl) {
+
+    public void terrainDisplay(GL3 gl,CoordFrame3D frame) {
+        frame = frame.translate(0,-2,0);
+        //        .scale(0.1f, 0.1f, 0.1f);
+        //rotateX += 1; // left right
+        //rotateY += 1; // forwards
+        //rotateZ += 1; // up down
+
+
+        drawTerrain(gl, frame.rotateX(rotateX).rotateY(rotateY).rotateZ(rotateZ));
+    }
+
+    public void terrainDestroy(GL3 gl) {
+        //gl.glDeleteBuffers(2, new int[] { indicesName, verticesName }, 0);
         terrain.destroy(gl);
-        texture.destroy(gl);
     }
 
     public void drawTerrain(GL3 gl, CoordFrame3D frame) {
         //	gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
 
-    	display(gl);
+//        Shader.setInt (gl, "tex", 0);
+//        gl.glActiveTexture(GL.GL_TEXTURE0);
+//        gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
+//        Shader.setPenColor(gl, Color.WHITE);
 
+        // Test light
+//        Shader.setPoint3D(gl, "lightPos", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
+//        Shader.setColor(gl, "lightIntensity", Color.WHITE);
+//        Shader.setColor(gl, "ambientIntensity", new Color(0.75f, 0.75f, 0.75f));
+//
+//        Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+//        Shader.setColor(gl, "diffuseCoeff", new Color(0.8f, 0.8f, 0.8f));
+//        Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
+//        Shader.setFloat(gl, "phongExp", 4f);
+
+        Shader.setModelMatrix(gl, frame.getMatrix());
+        terrain.draw(gl,frame);
         for (Tree tree : trees) {
             tree.display(gl);
         }
