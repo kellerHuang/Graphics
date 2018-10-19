@@ -13,7 +13,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
 
-import sun.font.TrueTypeFont;
+//import sun.font.TrueTypeFont;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
 import unsw.graphics.geometry.TriangleMesh;
@@ -232,7 +232,7 @@ public class Terrain{
 //    	return indices;
     }
 
-    public void terrainInit(GL3 gl) {
+    public void init(GL3 gl) {
         terrain = new TriangleMesh(getVertices(),getIndices(), true);
 
 //        int[] names = new int[2];
@@ -265,7 +265,7 @@ public class Terrain{
         drawTerrain(gl, frame.rotateX(rotateX).rotateY(rotateY).rotateZ(rotateZ));
     }
 
-    public void terrainDestroy(GL3 gl) {
+    public void destroy(GL3 gl) {
         //gl.glDeleteBuffers(2, new int[] { indicesName, verticesName }, 0);
         terrain.destroy(gl);
     }
