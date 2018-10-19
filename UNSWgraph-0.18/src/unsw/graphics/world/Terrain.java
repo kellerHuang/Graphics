@@ -232,8 +232,23 @@ public class Terrain{
 //    	return indices;
     }
 
-    public void terrainInit(GL3 gl) {
-        terrain = new TriangleMesh(getVertices(),getIndices(), true);
+    public List<Point2D> getTexture() {
+        List<Point2D> texCoords = new ArrayList<>();
+
+        for (int row = 0; row < width; row++){
+            for(int col = 0; col < depth; col++){
+                texCoords.add(new Point2D((float)row,(float)col));
+
+            }
+        }
+        return texCoords;
+    }
+
+
+
+    public void init(GL3 gl) {
+        terrain = new TriangleMesh(getVertices(),getIndices(), true, getTexture() );
+        terrain.init(gl);
 
 //        int[] names = new int[2];
 //        gl.glGenBuffers(2, names, 0);
@@ -265,7 +280,7 @@ public class Terrain{
         drawTerrain(gl, frame.rotateX(rotateX).rotateY(rotateY).rotateZ(rotateZ));
     }
 
-    public void terrainDestroy(GL3 gl) {
+    public void destroy(GL3 gl) {
         //gl.glDeleteBuffers(2, new int[] { indicesName, verticesName }, 0);
         terrain.destroy(gl);
     }
@@ -273,20 +288,20 @@ public class Terrain{
     public void drawTerrain(GL3 gl, CoordFrame3D frame) {
         //	gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
 
-//        Shader.setInt (gl, "tex", 0);
-//        gl.glActiveTexture(GL.GL_TEXTURE0);
-//        gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
-//        Shader.setPenColor(gl, Color.WHITE);
+        Shader.setInt (gl, "tex", 0);
+        gl.glActiveTexture(GL.GL_TEXTURE0);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
+        Shader.setPenColor(gl, Color.WHITE);
 
         // Test light
-//        Shader.setPoint3D(gl, "lightPos", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
-//        Shader.setColor(gl, "lightIntensity", Color.WHITE);
-//        Shader.setColor(gl, "ambientIntensity", new Color(0.75f, 0.75f, 0.75f));
-//
-//        Shader.setColor(gl, "ambientCoeff", Color.WHITE);
-//        Shader.setColor(gl, "diffuseCoeff", new Color(0.8f, 0.8f, 0.8f));
-//        Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
-//        Shader.setFloat(gl, "phongExp", 4f);
+        Shader.setPoint3D(gl, "lightPos", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
+        Shader.setColor(gl, "lightIntensity", Color.WHITE);
+        Shader.setColor(gl, "ambientIntensity", new Color(0.75f, 0.75f, 0.75f));
+
+        Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+        Shader.setColor(gl, "diffuseCoeff", new Color(0.8f, 0.8f, 0.8f));
+        Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
+        Shader.setFloat(gl, "phongExp", 4f);
 
         Shader.setModelMatrix(gl, frame.getMatrix());
         terrain.draw(gl,frame);
