@@ -7,9 +7,7 @@ import java.util.List;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
-import unsw.graphics.CoordFrame3D;
-import unsw.graphics.Shader;
-import unsw.graphics.Texture;
+import unsw.graphics.*;
 import unsw.graphics.geometry.LineStrip2D;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
@@ -42,6 +40,8 @@ public class Road {
         this.width = width;
         this.points = spine;
         this.altitude = altitude;
+        topRoad = new ArrayList<>();
+        bottomRoad = new ArrayList<>();
     }
 
     public void display(GL3 gl){
@@ -80,7 +80,6 @@ public class Road {
         //The initial shape we're extruding
         List<Point3D> roadControl = new ArrayList<Point3D>();
         List<Point3D> roadPoints = new ArrayList<Point3D>();
-        List<Point3D> roadPoints2 = new ArrayList<Point3D>();
         for(Point2D p: points) {
             roadControl.add(new Point3D(p.getX(),altitude,p.getY()));
         }
@@ -89,17 +88,38 @@ public class Road {
         float segmentSize = 1.0f/segments;
 
         for(int i = 0; i<segments; i++){
-            roadPoints.add(new Point3D(point(i*segmentSize).getX(),altitude,point(i*segmentSize).getY()));
-            roadPoints2.add(new Point3D(point(i*segmentSize).getX(),altitude+1,point(i*segmentSize).getY()));
+            roadPoints.add(new Point3D(point(i*segmentSize).getX(),altitude+0.01f,point(i*segmentSize).getY()));
+
         }
-        topRoad = roadPoints2;
-        bottomRoad= roadPoints;
+        //roadPoints.add(new Point3D(point(0.999999f).getX(),altitude+0.01f,point(0.999999f).getY()));
 
+        // extrude the top points
 
+        for(int i = 0; i < roadPoints.size(); i++){
+            // start point case
+            Matrix4 rot90 = Matrix4.rotationY(90);
+            Matrix4 rot270 = Matrix4.rotationY(270);
+            Point3D a;
+            Point3D b;
+            Vector3 c;
+            Vector4 d;
+            if (i == roadPoints.size()-1){
+                a = roadPoints.get(i);
+                b = roadPoints.get(i-1);
+                c = b.minus(a).normalize().scale(width/2);
+                d = new Vector4(c.getX(),c.getY(),c.getZ(),0);
+                topRoad.add(roadPoints.get(i).translate(rot270.multiply(d).trim()));
+                bottomRoad.add(roadPoints.get(i).translate(rot90.multiply(d).trim()));
+            }else {
+                a = roadPoints.get(i);
+                b = roadPoints.get(i + 1);
+                c = a.minus(b).normalize().scale(width/2);
+                d = new Vector4(c.getX(), c.getY(), c.getZ(), 0);
+                topRoad.add(roadPoints.get(i).translate(rot90.multiply(d).trim()));
+                bottomRoad.add(roadPoints.get(i).translate(rot270.multiply(d).trim()));
+            }
 
-
-
-
+        }
     }
 
     private TriangleMesh makeMesh(List<Point3D> a,List<Point3D> b){
@@ -125,7 +145,6 @@ public class Road {
             indices.add(z);
 
         }
-
         TriangleMesh road = new TriangleMesh(full,indices,true);
         return road;
     }

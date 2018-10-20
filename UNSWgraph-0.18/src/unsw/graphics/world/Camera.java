@@ -3,15 +3,20 @@ package unsw.graphics.world;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
 import unsw.graphics.CoordFrame2D;
 import unsw.graphics.CoordFrame3D;
 import unsw.graphics.Shader;
+import unsw.graphics.Texture;
 import unsw.graphics.geometry.LineStrip2D;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
+import unsw.graphics.geometry.TriangleMesh;
 
+import java.awt.*;
+import java.io.IOException;
 
 
 /**
@@ -22,80 +27,117 @@ import unsw.graphics.geometry.Point3D;
  */
 public class Camera implements KeyListener {
 
-    private Point3D myPos;
-    private float myAngle;
-    private float myScale;
-    private Terrain terrain;
-    public Camera(Terrain terrain) {
-        myPos = new Point3D(0, 0,20);
-        myAngle = 0;
-        myScale = 1f;
-        this.terrain = terrain;
-    }
-    
-    public void draw(GL3 gl, CoordFrame3D frame) {
-        CoordFrame3D cameraFrame = frame.translate(myPos)
-                .rotateZ(myAngle)
-                .scale(myScale, myScale,myScale);
-    }
+	private Point3D myPos;
+	private float myAngle;
+	private float myScale;
+	private Terrain terrain;
+	private TriangleMesh model;
+	private Texture texture;
+	public Camera(Terrain terrain) throws IOException {
+		myPos = new Point3D(0, 1,20);
+		myAngle = 0;
+		myScale = 1f;
+		this.terrain = terrain;
+		model = new TriangleMesh("res/models/bunny.ply", true, true);
 
-    /**
-     * Set the view transform
-     * 
-     * Note: this is the inverse of the model transform above
-     * 
-     * @param gl
-     */
-    public void setView(GL3 gl) {
-        CoordFrame3D viewFrame = CoordFrame3D.identity()
-                .scale(1/myScale, 1/myScale, 1/myScale)
-                .rotateY(myAngle)
-                .translate(-myPos.getX(), -myPos.getY(), -myPos.getZ());
-        Shader.setViewMatrix(gl, viewFrame.getMatrix());
-    }
+	}
+	public void init(GL3 gl) {
+		model.init(gl);
+		texture = new Texture(gl, "res/textures/rock.bmp", "bmp", false);
+		Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
+		shader.use(gl);
+	}
+	public void draw(GL3 gl, CoordFrame3D frame) {
+		CoordFrame3D cameraFrame = frame.translate(myPos)
+				.rotateZ(myAngle)
+				.scale(myScale, myScale,myScale);
+	}
+	public void display(GL3 gl, CoordFrame3D frame){
+		Shader.setInt (gl, "tex", 0);
+		gl.glActiveTexture(GL.GL_TEXTURE0);
+		gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
+		Shader.setPenColor(gl, Color.GREEN);
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-    	float x;
-    	float y;
-        switch(e.getKeyCode()) {
-        case KeyEvent.VK_LEFT:
-        	System.out.println("left");
-        	myAngle -=30;
-        	break;
-        case KeyEvent.VK_RIGHT:
-           	System.out.println("right");
-        	myAngle += 30; 
-        	break;
-        case KeyEvent.VK_DOWN:
-        	System.out.println("down");
-        	x = (float)Math.sin(Math.toRadians(myAngle))/5;
-        	y = (float)Math.cos(Math.toRadians(myAngle))/5;
-        	myPos = myPos.translate(-x,0,y);
-        	myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY(), 0);
-        	System.out.println(myAngle);
-        	System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
-        	System.out.println(myPos.getX());
-        	System.out.println(myPos.getY());
-        	System.out.println(myPos.getZ());
-        	break;
-        case KeyEvent.VK_UP:
-        	System.out.println("up");
-        	x = (float)Math.sin(Math.toRadians(myAngle))/5;
-        	y = (float)Math.cos(Math.toRadians(myAngle))/5;
-        	myPos = myPos.translate(x,0,-y);
-        	myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY(), 0);
-        	System.out.println(myAngle);
-        	System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
-        	System.out.println(myPos.getX());
-        	System.out.println(myPos.getY());
-        	System.out.println(myPos.getZ());
-        	break;
-        }
+		// Test light
+		Shader.setPoint3D(gl, "lightPos", new Point3D(0, 0, 5));
+		Shader.setColor(gl, "lightIntensity", Color.WHITE);
+		Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
 
-    }
+		Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+		Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+		Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
+		Shader.setFloat(gl, "phongExp", 16f);
 
-    @Override
-    public void keyReleased(KeyEvent e) {}
+		CoordFrame3D frame2 = CoordFrame3D.identity();
+
+		frame2 = frame2.translate(myPos.getX(),myPos.getY(),myPos.getZ()+5).rotateY(myAngle).scale(2,2,2);
+
+		model.draw (gl, frame2);
+	}
+	/**
+	 * Set the view transform
+	 *
+	 * Note: this is the inverse of the model transform above
+	 *
+	 * @param gl
+	 */
+	public void setView(GL3 gl) {
+		CoordFrame3D viewFrame = CoordFrame3D.identity()
+				.scale(1/myScale, 1/myScale, 1/myScale)
+				.rotateY(myAngle)
+				.translate(-myPos.getX(), -myPos.getY(), -myPos.getZ());
+		Shader.setViewMatrix(gl, viewFrame.getMatrix());
+	}
+
+	public Point3D getMyPos(){
+		return myPos;
+	}
+
+	public int getMyAngle(){
+		return (int)myAngle;
+	}
+	@Override
+	public void keyPressed(KeyEvent e) {
+		float x;
+		float y;
+		switch(e.getKeyCode()) {
+			case KeyEvent.VK_LEFT:
+//                System.out.println("left");
+				myAngle -=30;
+				break;
+			case KeyEvent.VK_RIGHT:
+//                System.out.println("right");
+				myAngle += 30;
+				break;
+			case KeyEvent.VK_DOWN:
+//                System.out.println("down");
+				x = (float)Math.sin(Math.toRadians(myAngle))/2;
+				y = (float)Math.cos(Math.toRadians(myAngle))/2;
+				myPos = myPos.translate(-x,0,y);
+				myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY()+1, 0);
+//                System.out.println(myAngle);
+//                System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
+//                System.out.println(myPos.getX());
+//                System.out.println(myPos.getY());
+//                System.out.println(myPos.getZ());
+				break;
+			case KeyEvent.VK_UP:
+//                System.out.println("up");
+				x = (float)Math.sin(Math.toRadians(myAngle))/2;
+				y = (float)Math.cos(Math.toRadians(myAngle))/2;
+				myPos = myPos.translate(x,0,-y);
+				myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY()+1, 0);
+//                System.out.println(myAngle);
+//                System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
+//                System.out.println(myPos.getX());
+//                System.out.println(myPos.getY());
+//                System.out.println(myPos.getZ());
+				break;
+		}
+
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {}
 
 }

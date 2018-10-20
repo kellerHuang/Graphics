@@ -273,7 +273,7 @@ public class Terrain{
     }
 
     public void terrainDisplay(GL3 gl,CoordFrame3D frame) {
-        frame = frame.translate(0,-2,0);
+        frame = frame.translate(0,0,0);
         //        .scale(0.1f, 0.1f, 0.1f);
         //rotateX += 1; // left right
         //rotateY += 1; // forwards
