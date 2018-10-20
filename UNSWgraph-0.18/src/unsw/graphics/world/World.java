@@ -40,7 +40,7 @@ public class World extends Application3D implements KeyListener{
 		}
 		myAngle = 0;
 		myPos = new Point3D(0,0,0);
-		//avatar = new Avatar(camera);
+		avatar = new Avatar(camera);
 	}
 
 	/**
@@ -58,15 +58,13 @@ public class World extends Application3D implements KeyListener{
 	@Override
 	public void display(GL3 gl) {
 		super.display(gl);
-		camera.display(gl,CoordFrame3D.identity());
-		camera.setView(gl);
-//		if (thirdPerson){
-//		    camera.display(gl,CoordFrame3D.identity());
-//		    //avatar.setView(gl);
-//            camera.setView(gl);
-//        }else{
-//            camera.setView(gl);
-//        }
+		if (thirdPerson){
+			avatar.setView(gl);
+			camera.display(gl);
+			//camera.setView(gl);
+		}else{
+			camera.setView(gl);
+		}
 		terrain.terrainDisplay(gl,CoordFrame3D.identity());
 	}
 

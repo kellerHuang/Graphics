@@ -88,7 +88,7 @@ public class Road {
         float segmentSize = 1.0f/segments;
 
         for(int i = 0; i<segments; i++){
-            roadPoints.add(new Point3D(point(i*segmentSize).getX(),altitude+0.01f,point(i*segmentSize).getY()));
+            roadPoints.add(new Point3D(point(i*segmentSize).getX(),altitude+0.05f,point(i*segmentSize).getY()));
 
         }
         //roadPoints.add(new Point3D(point(0.999999f).getX(),altitude+0.01f,point(0.999999f).getY()));

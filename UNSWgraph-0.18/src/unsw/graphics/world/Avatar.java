@@ -28,8 +28,8 @@ public class Avatar {
     private Camera modelLoc;
 
     public Avatar(Camera cam) {
-        myPos = cam.getMyPos();
-        myAngle = cam.getMyAngle();
+        //myPos = cam.getMyPos();
+        //myAngle = cam.getMyAngle();
         myScale = 1f;
         modelLoc = cam;
     }
@@ -40,16 +40,15 @@ public class Avatar {
                 .scale(myScale, myScale, myScale);
     }
 
-//    public void setView(GL3 gl) {
-//        myAngle = modelLoc.getMyAngle();
-//        myPos = modelLoc.getMyPos();
-//        float x = (float)Math.sin(Math.toRadians(myAngle));
-//        float z = (float)Math.cos(Math.toRadians(myAngle));
-//        CoordFrame3D viewFrame = CoordFrame3D.identity()
-//                .scale(1/myScale, 1/myScale, 1/myScale)
-//                .rotateY(myAngle)
-//                .translate(-myPos.getX()-x, -myPos.getY(), -myPos.getZ()-z);
-//        Shader.setViewMatrix(gl, viewFrame.getMatrix());
-//    }
+    public void setView(GL3 gl) {
+        myAngle = modelLoc.getMyAngle();
+        myPos = modelLoc.getMyPos();
+        float x = 2*(float)Math.sin(Math.toRadians(myAngle));
+        float z = 2*(float)Math.cos(Math.toRadians(myAngle));
+        CoordFrame3D viewFrame = CoordFrame3D.identity()
+                .rotateY(myAngle)
+                .translate(-myPos.getX()+x, -myPos.getY()-0.01f, -myPos.getZ()-z);
+        Shader.setViewMatrix(gl, viewFrame.getMatrix());
+    }
 
 }

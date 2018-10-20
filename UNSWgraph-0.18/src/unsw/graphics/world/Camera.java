@@ -9,10 +9,10 @@ import com.jogamp.opengl.GL3;
 import unsw.graphics.CoordFrame2D;
 import unsw.graphics.CoordFrame3D;
 import unsw.graphics.Shader;
-import unsw.graphics.Texture;
 import unsw.graphics.geometry.LineStrip2D;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
+import unsw.graphics.Texture;
 import unsw.graphics.geometry.TriangleMesh;
 
 import java.awt.*;
@@ -31,15 +31,20 @@ public class Camera implements KeyListener {
 	private float myAngle;
 	private float myScale;
 	private Terrain terrain;
-	private TriangleMesh model;
 	private Texture texture;
+	private TriangleMesh model;
 	public Camera(Terrain terrain) throws IOException {
 		myPos = new Point3D(0, 1,20);
 		myAngle = 0;
 		myScale = 1f;
-		this.terrain = terrain;
 		model = new TriangleMesh("res/models/bunny.ply", true, true);
+		this.terrain = terrain;
+	}
 
+	public void draw(GL3 gl, CoordFrame3D frame) {
+		CoordFrame3D cameraFrame = frame.translate(myPos)
+				.rotateZ(myAngle)
+				.scale(myScale, myScale,myScale);
 	}
 	public void init(GL3 gl) {
 		model.init(gl);
@@ -47,12 +52,7 @@ public class Camera implements KeyListener {
 		Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
 		shader.use(gl);
 	}
-	public void draw(GL3 gl, CoordFrame3D frame) {
-		CoordFrame3D cameraFrame = frame.translate(myPos)
-				.rotateZ(myAngle)
-				.scale(myScale, myScale,myScale);
-	}
-	public void display(GL3 gl, CoordFrame3D frame){
+	public void display(GL3 gl) {
 		Shader.setInt (gl, "tex", 0);
 		gl.glActiveTexture(GL.GL_TEXTURE0);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
@@ -68,11 +68,14 @@ public class Camera implements KeyListener {
 		Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
 		Shader.setFloat(gl, "phongExp", 16f);
 
-		CoordFrame3D frame2 = CoordFrame3D.identity();
-
-		frame2 = frame2.translate(myPos.getX(),myPos.getY(),myPos.getZ()+5).rotateY(myAngle).scale(2,2,2);
-
-		model.draw (gl, frame2);
+		CoordFrame3D frame = CoordFrame3D.identity().translate(myPos).translate(0,-1,0).rotateY(-myAngle+180).scale(2,2,2);
+		model.draw (gl, frame);
+	}
+	public Point3D getMyPos(){
+		return myPos;
+	}
+	public int getMyAngle(){
+		return (int)myAngle;
 	}
 	/**
 	 * Set the view transform
@@ -89,49 +92,42 @@ public class Camera implements KeyListener {
 		Shader.setViewMatrix(gl, viewFrame.getMatrix());
 	}
 
-	public Point3D getMyPos(){
-		return myPos;
-	}
-
-	public int getMyAngle(){
-		return (int)myAngle;
-	}
 	@Override
 	public void keyPressed(KeyEvent e) {
 		float x;
 		float y;
 		switch(e.getKeyCode()) {
 			case KeyEvent.VK_LEFT:
-//                System.out.println("left");
+				System.out.println("left");
 				myAngle -=30;
 				break;
 			case KeyEvent.VK_RIGHT:
-//                System.out.println("right");
+				System.out.println("right");
 				myAngle += 30;
 				break;
 			case KeyEvent.VK_DOWN:
-//                System.out.println("down");
-				x = (float)Math.sin(Math.toRadians(myAngle))/2;
-				y = (float)Math.cos(Math.toRadians(myAngle))/2;
+				System.out.println("down");
+				x = (float)Math.sin(Math.toRadians(myAngle))/5;
+				y = (float)Math.cos(Math.toRadians(myAngle))/5;
 				myPos = myPos.translate(-x,0,y);
 				myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY()+1, 0);
-//                System.out.println(myAngle);
-//                System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
-//                System.out.println(myPos.getX());
-//                System.out.println(myPos.getY());
-//                System.out.println(myPos.getZ());
+				System.out.println(myAngle);
+				System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
+				System.out.println(myPos.getX());
+				System.out.println(myPos.getY());
+				System.out.println(myPos.getZ());
 				break;
 			case KeyEvent.VK_UP:
-//                System.out.println("up");
-				x = (float)Math.sin(Math.toRadians(myAngle))/2;
-				y = (float)Math.cos(Math.toRadians(myAngle))/2;
+				System.out.println("up");
+				x = (float)Math.sin(Math.toRadians(myAngle))/5;
+				y = (float)Math.cos(Math.toRadians(myAngle))/5;
 				myPos = myPos.translate(x,0,-y);
 				myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY()+1, 0);
-//                System.out.println(myAngle);
-//                System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
-//                System.out.println(myPos.getX());
-//                System.out.println(myPos.getY());
-//                System.out.println(myPos.getZ());
+				System.out.println(myAngle);
+				System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
+				System.out.println(myPos.getX());
+				System.out.println(myPos.getY());
+				System.out.println(myPos.getZ());
 				break;
 		}
 
