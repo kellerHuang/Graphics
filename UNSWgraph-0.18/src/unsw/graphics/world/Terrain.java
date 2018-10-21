@@ -11,9 +11,7 @@ import java.util.List;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.util.GLBuffers;
 
-import sun.font.TrueTypeFont;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
 import unsw.graphics.geometry.TriangleMesh;
