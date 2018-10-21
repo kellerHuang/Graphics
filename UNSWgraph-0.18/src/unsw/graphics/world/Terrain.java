@@ -1,7 +1,7 @@
 package unsw.graphics.world;
 
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.nio.IntBuffer;
@@ -42,6 +42,7 @@ public class Terrain{
     private int rotateY;
     private int rotateZ;
     private Texture texture;
+    private Point3D lightLocation;
 
     /**
      * Create a new terrain
@@ -272,7 +273,7 @@ public class Terrain{
         //Shader.setProjMatrix(gl, Matrix4.perspective(50, 1, 1, 10));
     }
 
-    public void terrainDisplay(GL3 gl,CoordFrame3D frame) {
+    public void terrainDisplay(GL3 gl,CoordFrame3D frame, Point3D location, boolean night) {
         frame = frame.translate(0,0,0);
         //        .scale(0.1f, 0.1f, 0.1f);
         //rotateX += 1; // left right
@@ -280,7 +281,7 @@ public class Terrain{
         //rotateZ += 1; // up down
 
 
-        drawTerrain(gl, frame.rotateX(rotateX).rotateY(rotateY).rotateZ(rotateZ));
+        drawTerrain(gl, frame, location, night);
     }
 
     public void destroy(GL3 gl) {
@@ -288,7 +289,7 @@ public class Terrain{
         terrain.destroy(gl);
     }
 
-    public void drawTerrain(GL3 gl, CoordFrame3D frame) {
+    public void drawTerrain(GL3 gl, CoordFrame3D frame, Point3D location, boolean night) {
         //	gl.glPolygonMode(GL.GL_FRONT_AND_BACK,  GL3.GL_LINE);
 
         Shader.setInt (gl, "tex", 0);
@@ -297,22 +298,46 @@ public class Terrain{
         Shader.setPenColor(gl, Color.WHITE);
 
         // Test light
-        Shader.setPoint3D(gl, "lightPos", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
-        Shader.setColor(gl, "lightIntensity", Color.WHITE);
-        Shader.setColor(gl, "ambientIntensity", new Color(0.75f, 0.75f, 0.75f));
-
-        Shader.setColor(gl, "ambientCoeff", Color.WHITE);
-        Shader.setColor(gl, "diffuseCoeff", new Color(0.8f, 0.8f, 0.8f));
-        Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
-        Shader.setFloat(gl, "phongExp", 4f);
-
-        Shader.setModelMatrix(gl, frame.getMatrix());
-        terrain.draw(gl,frame);
-        for (Tree tree : trees) {
-            tree.display(gl);
+        if (night) {
+            Shader.setPoint3D(gl, "lightPos", new Point3D(location.getX(), location.getY(), location.getZ()));
+            Shader.setColor(gl, "lightIntensity", Color.BLACK);
+            Shader.setColor(gl, "ambientIntensity", new Color(0.9f, 0.9f, 0.9f));
+            Shader.setInt(gl, "night", 1);
+            Shader.setFloat(gl, "cutoff", 12);
+            Shader.setFloat(gl, "attenuation", 32);
+            Shader.setColor(gl, "ambientCoeff", Color.DARK_GRAY);
+            Shader.setColor(gl, "diffuseCoeff", new Color(0.9f, 0.9f, 0.9f));
+            Shader.setColor(gl, "specularCoeff", new Color(0.05f, 0.05f, 0.05f));
+            Shader.setFloat(gl, "phongExp", 4f);
+            Shader.setModelMatrix(gl, frame.getMatrix());
+            System.out.println("night");
+            terrain.draw(gl,frame);
+            for (Tree tree : trees) {
+                tree.display(gl, new Vector3(location.getX(), location.getY(), location.getZ()));
+            }
+            for (Road road : roads) {
+                road.display(gl, new Vector3(location.getX(), location.getY(), location.getZ()));
+            }
+        } else {
+            Shader.setPoint3D(gl, "lightPos", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
+            Shader.setColor(gl, "lightIntensity", Color.WHITE);
+            Shader.setColor(gl, "ambientIntensity", new Color(0.75f, 0.75f, 0.75f));
+            Shader.setInt(gl, "night", 0);
+            Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+            Shader.setColor(gl, "diffuseCoeff", new Color(0.8f, 0.8f, 0.8f));
+            Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
+            Shader.setFloat(gl, "phongExp", 4f);
+            Shader.setModelMatrix(gl, frame.getMatrix());
+            terrain.draw(gl,frame);
+            for (Tree tree : trees) {
+                tree.display(gl, getSunlight());
+            }
+            for (Road road : roads) {
+                road.display(gl, getSunlight());
+            }
         }
-        for (Road road : roads) {
-            road.display(gl);
-        }
+
+
     }
+
 }

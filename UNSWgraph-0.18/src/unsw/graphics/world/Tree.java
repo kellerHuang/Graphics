@@ -6,11 +6,7 @@ import java.io.IOException;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
-import unsw.graphics.Application3D;
-import unsw.graphics.CoordFrame3D;
-import unsw.graphics.Matrix4;
-import unsw.graphics.Shader;
-import unsw.graphics.Texture;
+import unsw.graphics.*;
 import unsw.graphics.geometry.Point3D;
 import unsw.graphics.geometry.TriangleMesh;
 
@@ -28,7 +24,7 @@ public class Tree {
 
 
     public Tree(float x, float y, float z) throws IOException {
-        model = new TriangleMesh("res/models/tree.ply", true, true);
+        model = new TriangleMesh("res/models/apple.ply", true, true);
         position = new Point3D(x, y, z);
     }
 
@@ -40,17 +36,18 @@ public class Tree {
     }
 
 
-    public void display(GL3 gl) {
+    public void display(GL3 gl, Vector3 lightDir) {
         Shader.setInt (gl, "tex", 0);
         gl.glActiveTexture(GL.GL_TEXTURE0);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
         Shader.setPenColor(gl, Color.GREEN);
 
         // Test light
-        Shader.setPoint3D(gl, "lightPos", new Point3D(0, 0, 5));
+//        System.out.println(lightDir.getX());
+//        System.out.println(lightDir.getZ());
+        Shader.setPoint3D(gl, "lightPos", new Point3D(lightDir.getX(), lightDir.getY(), lightDir.getZ()));
         Shader.setColor(gl, "lightIntensity", Color.WHITE);
         Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
-
         Shader.setColor(gl, "ambientCoeff", Color.WHITE);
         Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
         Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
@@ -59,8 +56,8 @@ public class Tree {
         CoordFrame3D frame = CoordFrame3D.identity();
 
         CoordFrame3D treeFrame = frame
-                .translate (position.getX(), position.getY()+1, position.getZ())
-                .scale (0.2f, 0.2f, 0.2f);
+                .translate (position.getX(), position.getY(), position.getZ())
+                .scale (5f, 5f, 5f);
         model.draw (gl, treeFrame);
     }
 
