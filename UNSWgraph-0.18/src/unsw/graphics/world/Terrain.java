@@ -309,12 +309,12 @@ public class Terrain{
 
         // Test light
         if (night) {
-            Shader.setPoint3D(gl, "lightDir", new Point3D(location.getX(), location.getY(), location.getZ()));
-            Shader.setColor(gl, "lightIntensity", Color.BLACK);
+            Shader.setPoint3D(gl, "lightPos", new Point3D(location.getX(), location.getY(), location.getZ()));
+            Shader.setColor(gl, "lightIntensity", Color.WHITE);
             Shader.setColor(gl, "ambientIntensity", new Color(0.9f, 0.9f, 0.9f));
             Shader.setInt(gl, "night", 1);
-            Shader.setFloat(gl, "cutoff", 12);
-            Shader.setFloat(gl, "attenuation", 32);
+            Shader.setFloat(gl, "cutoff", 10);
+            Shader.setFloat(gl, "attenuation", 64);
             Shader.setColor(gl, "ambientCoeff", Color.DARK_GRAY);
             Shader.setColor(gl, "diffuseCoeff", new Color(0.9f, 0.9f, 0.9f));
             Shader.setColor(gl, "specularCoeff", new Color(0.05f, 0.05f, 0.05f));
@@ -326,13 +326,13 @@ public class Terrain{
                 tree.display(gl, new Vector3(location.getX(), location.getY(), location.getZ()));
             }
             for (Road road : roads) {
-                road.display(gl, new Vector3(location.getX(), location.getY(), location.getZ()));
+                road.display(gl, new Vector3(location.getX(), location.getY(), location.getZ()), true);
             }
             for (Pond pond: ponds) {
-                pond.display(gl);
+                pond.display(gl, new Vector3(location.getX(), location.getY(), location.getZ()), true);
             }
         } else {
-            Shader.setPoint3D(gl, "lightDir", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
+            Shader.setPoint3D(gl, "lightDir", new Point3D(getSunlight().asPoint3D().getX(), getSunlight().asPoint3D().getY(),getSunlight().asPoint3D().getZ()));
             Shader.setColor(gl, "lightIntensity", Color.WHITE);
             Shader.setColor(gl, "ambientIntensity", new Color(0.75f, 0.75f, 0.75f));
             Shader.setInt(gl, "night", 0);
@@ -346,10 +346,10 @@ public class Terrain{
                 tree.display(gl, getSunlight());
             }
             for (Road road : roads) {
-                road.display(gl, getSunlight());
+                road.display(gl, getSunlight(), false);
             }
             for (Pond pond: ponds) {
-                pond.display(gl);
+                pond.display(gl, getSunlight(), false);
             }
         }
     }

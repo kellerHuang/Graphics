@@ -1,7 +1,6 @@
 package unsw.graphics.world;
 
 
-import com.jogamp.graph.geom.Triangle;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.opengl.GL;
@@ -27,7 +26,7 @@ import java.util.List;
  */
 public class Camera implements KeyListener {
 
-	private Point3D myPos;
+	Point3D myPos;
 	private float myAngle;
 	private float myScale;
 	private Terrain terrain;
@@ -64,7 +63,7 @@ public class Camera implements KeyListener {
 		Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
 		shader.use(gl);
 	}
-	public void display(GL3 gl) {
+	public void display(GL3 gl, Boolean night) {
 		Shader.setInt (gl, "tex", 0);
 		gl.glActiveTexture(GL.GL_TEXTURE0);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
@@ -85,12 +84,13 @@ public class Camera implements KeyListener {
         System.out.println(offset);
 //
 //		// Test light
-		Matrix4 rotate = Matrix4.rotationY(myAngle);
-		Vector3 rotated = rotate.multiply(terrain.getSunlight().extend()).trim();
-		Shader.setPoint3D(gl, "lightDir", new Point3D(rotated.getX(),rotated.getY(),rotated.getZ()));
-		//Shader.setPoint3D(gl, "lightDir", new Point3D(terrain.getSunlight().getX(),terrain.getSunlight().getY(),terrain.getSunlight().getZ()));
-		Shader.setColor(gl, "lightIntensity", Color.WHITE);
-		Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
+        if(!night) {
+            Matrix4 rotate = Matrix4.rotationY(myAngle);
+            Vector3 rotated = rotate.multiply(terrain.getSunlight().extend()).trim();
+            Shader.setPoint3D(gl, "lightDir", new Point3D(rotated.getX(), rotated.getY(), rotated.getZ()));
+            //Shader.setPoint3D(gl, "lightDir", new Point3D(terrain.getSunlight().getX(),terrain.getSunlight().getY(),terrain.getSunlight().getZ()));
+            Shader.setColor(gl, "lightIntensity", Color.WHITE);
+            Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
 
 		Shader.setColor(gl, "ambientCoeff", Color.WHITE);
 		Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
@@ -226,9 +226,9 @@ public class Camera implements KeyListener {
 				break;
 		}
 
-	}
+    }
 
-	@Override
-	public void keyReleased(KeyEvent e) {}
+    @Override
+    public void keyReleased(KeyEvent e) {}
 
 }

@@ -48,21 +48,30 @@ public class Road {
         texCoords = new ArrayList<>();
     }
 
-    public void display(GL3 gl, Vector3 lightDir){
+    public void display(GL3 gl, Vector3 light, Boolean night){
         Shader.setInt (gl, "tex", 0);
         gl.glActiveTexture(GL.GL_TEXTURE0);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
         Shader.setPenColor(gl, Color.WHITE);
 
         // Test light
-        Shader.setPoint3D(gl, "lightPos", new Point3D(lightDir.getX(), lightDir.getY(), lightDir.getZ()));
-        Shader.setColor(gl, "lightIntensity", Color.WHITE);
-        Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
-
-        Shader.setColor(gl, "ambientCoeff", Color.WHITE);
-        Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
-        Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
-        Shader.setFloat(gl, "phongExp", 16f);
+        if (!night) {
+            Shader.setPoint3D(gl, "lightDir", new Point3D(light.asPoint3D().getX(), light.asPoint3D().getY(), light.asPoint3D().getZ()));
+            Shader.setColor(gl, "lightIntensity", Color.WHITE);
+            Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
+            Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+            Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+            Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
+            Shader.setFloat(gl, "phongExp", 16f);
+        } else {
+            Shader.setPoint3D(gl, "lightPos", new Point3D(light.asPoint3D().getX(), light.asPoint3D().getY(), light.asPoint3D().getZ()));
+            Shader.setColor(gl, "lightIntensity", Color.YELLOW);
+            Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
+            Shader.setColor(gl, "ambientCoeff", Color.DARK_GRAY);
+            Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+            Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
+            Shader.setFloat(gl, "phongExp", 16f);
+        }
 
         for(TriangleMesh mesh: meshes){
             mesh.draw(gl);
