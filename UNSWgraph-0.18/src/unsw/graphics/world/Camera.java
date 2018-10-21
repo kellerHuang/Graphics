@@ -92,11 +92,11 @@ public class Camera implements KeyListener {
             Shader.setColor(gl, "lightIntensity", Color.WHITE);
             Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
 
-		Shader.setColor(gl, "ambientCoeff", Color.WHITE);
-		Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
-		Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
-		Shader.setFloat(gl, "phongExp", 16f);
-
+            Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+            Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+            Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
+            Shader.setFloat(gl, "phongExp", 16f);
+        }
 		CoordFrame3D frame = CoordFrame3D.identity().translate(myPos).translate(0,-0.8f,0).rotateY(-myAngle+180).scale(0.3f,0.3f,0.3f);
         model.draw(gl,frame);
 //        frame = CoordFrame3D.identity().translate(myPos).translate(-2,-1,0).rotateY(-myAngle+180).scale(0.2f,0.2f,0.2f);
