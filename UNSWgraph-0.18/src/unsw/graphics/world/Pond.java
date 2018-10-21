@@ -60,14 +60,14 @@ public class Pond {
         mesh  = new TriangleMesh(vertices,indices,true,texCoords);
     }
 
-    public void display(GL3 gl){
+    public void display(GL3 gl, Vector3 light, Boolean night){
 //        if(timer == 60){
 //            timer = 0;
 //        }
 //        if(timer > 30){
 //            loadGrass(gl);
 //        }else{
-            //loadRock(gl);
+        //loadRock(gl);
 //        }
         float timer = (System.currentTimeMillis()/100 % 15);
         System.out.println("x");
@@ -87,14 +87,25 @@ public class Pond {
         }
         //gl.glPolygonOffset(3.0f, -3.0f);
         // Test light
-        Shader.setPoint3D(gl, "lightDir", new Point3D(0, 0, 5));
-        Shader.setColor(gl, "lightIntensity", Color.WHITE);
-        Shader.setColor(gl, "ambientIntensity", new Color(0.8f, 0.8f, 0.8f));
 
-        Shader.setColor(gl, "ambientCoeff", Color.WHITE);
-        Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
-        Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
-        Shader.setFloat(gl, "phongExp", 4f);
+        if (!night) {
+            Shader.setPoint3D(gl, "lightDir", new Point3D(light.asPoint3D().getX(), light.asPoint3D().getY(), light.asPoint3D().getZ()));
+            Shader.setColor(gl, "lightIntensity", Color.WHITE);
+            Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
+            Shader.setColor(gl, "ambientCoeff", Color.WHITE);
+            Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+            Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
+            Shader.setFloat(gl, "phongExp", 16f);
+        } else {
+            Shader.setPoint3D(gl, "lightPos", new Point3D(light.asPoint3D().getX(), light.asPoint3D().getY(), light.asPoint3D().getZ()));
+            Shader.setColor(gl, "lightIntensity", Color.YELLOW);
+            Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
+            Shader.setColor(gl, "ambientCoeff", Color.DARK_GRAY);
+            Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+            Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
+            Shader.setFloat(gl, "phongExp", 16f);
+        }
+
         mesh.draw(gl);
     }
 
