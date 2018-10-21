@@ -59,6 +59,7 @@ public class World extends Application3D implements KeyListener{
 	@Override
 	public void display(GL3 gl) {
 		super.display(gl);
+
 		if (thirdPerson){
 			avatar.setView(gl);
 			camera.display(gl);
@@ -66,7 +67,6 @@ public class World extends Application3D implements KeyListener{
 		}else{
 			camera.setView(gl);
 		}
-
 		if (night) {
 			terrain.terrainDisplay(gl, CoordFrame3D.identity(), avatar.myPos, true);
 		} else {

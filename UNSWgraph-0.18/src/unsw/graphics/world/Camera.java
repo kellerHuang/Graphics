@@ -54,11 +54,12 @@ public class Camera implements KeyListener {
 		gl.glActiveTexture(GL.GL_TEXTURE0);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
 		Shader.setPenColor(gl, Color.GREEN);
-
-		// Test light
-		Matrix4 rotate = Matrix4.rotationY(myAngle);
-		Vector3 rotated = rotate.multiply(terrain.getSunlight().extend()).trim();
-		Shader.setPoint3D(gl, "lightDir", new Point3D(rotated.getX(),rotated.getY(),rotated.getZ()));
+//
+//		// Test light
+//		Matrix4 rotate = Matrix4.rotationY(myAngle);
+//		Vector3 rotated = rotate.multiply(terrain.getSunlight().extend()).trim();
+//		Shader.setPoint3D(gl, "lightDir", new Point3D(rotated.getX(),rotated.getY(),rotated.getZ()));
+		Shader.setPoint3D(gl, "lightDir", new Point3D(terrain.getSunlight().getX(),terrain.getSunlight().getY(),terrain.getSunlight().getZ()));
 		Shader.setColor(gl, "lightIntensity", Color.WHITE);
 		Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
 

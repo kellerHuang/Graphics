@@ -70,6 +70,7 @@ public class Pond {
             //loadRock(gl);
 //        }
         float timer = (System.currentTimeMillis()/100 % 15);
+        System.out.println("x");
         if(timer <5) {
             Shader.setInt(gl, "tex", 0);
             gl.glActiveTexture(GL.GL_TEXTURE0);
@@ -84,9 +85,9 @@ public class Pond {
             gl.glBindTexture(GL.GL_TEXTURE_2D, texture3.getId());
             Shader.setPenColor(gl, Color.WHITE);
         }
-        gl.glPolygonOffset(3.0f, -3.0f);
+        //gl.glPolygonOffset(3.0f, -3.0f);
         // Test light
-        Shader.setPoint3D(gl, "lightPos", new Point3D(0, 0, 5));
+        Shader.setPoint3D(gl, "lightDir", new Point3D(0, 0, 5));
         Shader.setColor(gl, "lightIntensity", Color.WHITE);
         Shader.setColor(gl, "ambientIntensity", new Color(0.9f, 0.9f, 0.9f));
 

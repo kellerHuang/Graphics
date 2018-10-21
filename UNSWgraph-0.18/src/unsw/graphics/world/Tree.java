@@ -45,7 +45,7 @@ public class Tree {
         // Test light
 //        System.out.println(lightDir.getX());
 //        System.out.println(lightDir.getZ());
-        Shader.setPoint3D(gl, "lightPos", new Point3D(lightDir.getX(), lightDir.getY(), lightDir.getZ()));
+        Shader.setPoint3D(gl, "lightDir", new Point3D(lightDir.getX(), lightDir.getY(), lightDir.getZ()));
         Shader.setColor(gl, "lightIntensity", Color.WHITE);
         Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
         Shader.setColor(gl, "ambientCoeff", Color.WHITE);

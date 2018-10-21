@@ -11,8 +11,6 @@ import java.util.List;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.GLBuffers;
-
-import sun.font.TrueTypeFont;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
 import unsw.graphics.geometry.TriangleMesh;
@@ -311,7 +309,7 @@ public class Terrain{
 
         // Test light
         if (night) {
-            Shader.setPoint3D(gl, "lightPos", new Point3D(location.getX(), location.getY(), location.getZ()));
+            Shader.setPoint3D(gl, "lightDir", new Point3D(location.getX(), location.getY(), location.getZ()));
             Shader.setColor(gl, "lightIntensity", Color.BLACK);
             Shader.setColor(gl, "ambientIntensity", new Color(0.9f, 0.9f, 0.9f));
             Shader.setInt(gl, "night", 1);
@@ -330,8 +328,11 @@ public class Terrain{
             for (Road road : roads) {
                 road.display(gl, new Vector3(location.getX(), location.getY(), location.getZ()));
             }
+            for (Pond pond: ponds) {
+                pond.display(gl);
+            }
         } else {
-            Shader.setPoint3D(gl, "lightPos", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
+            Shader.setPoint3D(gl, "lightDir", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
             Shader.setColor(gl, "lightIntensity", Color.WHITE);
             Shader.setColor(gl, "ambientIntensity", new Color(0.75f, 0.75f, 0.75f));
             Shader.setInt(gl, "night", 0);
@@ -347,9 +348,9 @@ public class Terrain{
             for (Road road : roads) {
                 road.display(gl, getSunlight());
             }
-        }
-        for (Pond pond: ponds) {
-            pond.display(gl);
+            for (Pond pond: ponds) {
+                pond.display(gl);
+            }
         }
     }
 }
