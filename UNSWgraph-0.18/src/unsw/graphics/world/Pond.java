@@ -89,12 +89,12 @@ public class Pond {
         // Test light
         Shader.setPoint3D(gl, "lightDir", new Point3D(0, 0, 5));
         Shader.setColor(gl, "lightIntensity", Color.WHITE);
-        Shader.setColor(gl, "ambientIntensity", new Color(0.9f, 0.9f, 0.9f));
+        Shader.setColor(gl, "ambientIntensity", new Color(0.8f, 0.8f, 0.8f));
 
         Shader.setColor(gl, "ambientCoeff", Color.WHITE);
         Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
-        Shader.setColor(gl, "specularCoeff", new Color(0.75f, 0.75f, 0.75f));
-        Shader.setFloat(gl, "phongExp", 16f);
+        Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
+        Shader.setFloat(gl, "phongExp", 4f);
         mesh.draw(gl);
     }
 

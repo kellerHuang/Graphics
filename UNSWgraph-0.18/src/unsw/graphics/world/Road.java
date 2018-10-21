@@ -29,6 +29,7 @@ public class Road {
     private int segments = 32;
     private List<Point3D> topRoad;
     private List<Point3D> bottomRoad;
+    private List<Point2D> texCoords;
     private Point3D extra;
 
 
@@ -44,6 +45,7 @@ public class Road {
         this.altitude = altitude;
         topRoad = new ArrayList<>();
         bottomRoad = new ArrayList<>();
+        texCoords = new ArrayList<>();
     }
 
     public void display(GL3 gl, Vector3 lightDir){
@@ -124,14 +126,18 @@ public class Road {
                 c = b.minus(a).normalize().scale(width/2);
                 d = new Vector4(c.getX(),c.getY(),c.getZ(),0);
                 topRoad.add(roadPoints.get(i).translate(rot270.multiply(d).trim()));
+                texCoords.add(new Point2D(topRoad.get(topRoad.size()-1).getX(),topRoad.get(topRoad.size()-1).getZ()));
                 bottomRoad.add(roadPoints.get(i).translate(rot90.multiply(d).trim()));
+                texCoords.add(new Point2D(bottomRoad.get(bottomRoad.size()-1).getX(),bottomRoad.get(bottomRoad.size()-1).getZ()));
             }else {
                 a = roadPoints.get(i);
                 b = roadPoints.get(i + 1);
                 c = a.minus(b).normalize().scale(width/2);
                 d = new Vector4(c.getX(), c.getY(), c.getZ(), 0);
                 topRoad.add(roadPoints.get(i).translate(rot90.multiply(d).trim()));
+                texCoords.add(new Point2D(topRoad.get(topRoad.size()-1).getX(),topRoad.get(topRoad.size()-1).getZ()));
                 bottomRoad.add(roadPoints.get(i).translate(rot270.multiply(d).trim()));
+                texCoords.add(new Point2D(bottomRoad.get(bottomRoad.size()-1).getX(),bottomRoad.get(bottomRoad.size()-1).getZ()));
             }
 
         }
@@ -160,7 +166,7 @@ public class Road {
             indices.add(z);
 
         }
-        TriangleMesh road = new TriangleMesh(full,indices,true);
+        TriangleMesh road = new TriangleMesh(full,indices,true,texCoords);
         return road;
     }
 

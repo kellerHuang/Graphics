@@ -32,7 +32,7 @@ void main()
     float angle;
 	vec3 m_unit = normalize(m);
     // Compute the s, v and r vectors
-    vec3 s = normalize(lightDir).xyz;
+    vec3 s = normalize(-lightDir).xyz;
     //vec3 s = normalize(view_matrix*vec4(lightPos,1) - viewPosition).xyz;
     //vec3 s = normalize(view_matrix*vec4(lightPos,1)).xyz;
     vec3 v = normalize(-viewPosition.xyz);
