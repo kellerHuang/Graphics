@@ -6,13 +6,10 @@ import com.jogamp.newt.event.KeyListener;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
-import unsw.graphics.CoordFrame2D;
-import unsw.graphics.CoordFrame3D;
-import unsw.graphics.Shader;
+import unsw.graphics.*;
 import unsw.graphics.geometry.LineStrip2D;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
-import unsw.graphics.Texture;
 import unsw.graphics.geometry.TriangleMesh;
 
 import java.awt.*;
@@ -59,7 +56,9 @@ public class Camera implements KeyListener {
 		Shader.setPenColor(gl, Color.GREEN);
 
 		// Test light
-		Shader.setPoint3D(gl, "lightPos", new Point3D(0, 0, 5));
+		Matrix4 rotate = Matrix4.rotationY(myAngle);
+		Vector3 rotated = rotate.multiply(terrain.getSunlight().extend()).trim();
+		Shader.setPoint3D(gl, "lightDir", new Point3D(rotated.getX(),rotated.getY(),rotated.getZ()));
 		Shader.setColor(gl, "lightIntensity", Color.WHITE);
 		Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
 
@@ -98,36 +97,22 @@ public class Camera implements KeyListener {
 		float y;
 		switch(e.getKeyCode()) {
 			case KeyEvent.VK_LEFT:
-				System.out.println("left");
 				myAngle -=30;
 				break;
 			case KeyEvent.VK_RIGHT:
-				System.out.println("right");
 				myAngle += 30;
 				break;
 			case KeyEvent.VK_DOWN:
-				System.out.println("down");
 				x = (float)Math.sin(Math.toRadians(myAngle))/5;
 				y = (float)Math.cos(Math.toRadians(myAngle))/5;
 				myPos = myPos.translate(-x,0,y);
 				myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY()+1, 0);
-				System.out.println(myAngle);
-				System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
-				System.out.println(myPos.getX());
-				System.out.println(myPos.getY());
-				System.out.println(myPos.getZ());
 				break;
 			case KeyEvent.VK_UP:
-				System.out.println("up");
 				x = (float)Math.sin(Math.toRadians(myAngle))/5;
 				y = (float)Math.cos(Math.toRadians(myAngle))/5;
 				myPos = myPos.translate(x,0,-y);
 				myPos = myPos.translate(0, terrain.altitude(myPos.getX(), myPos.getZ())-myPos.getY()+1, 0);
-				System.out.println(myAngle);
-				System.out.println(terrain.altitude(myPos.getX(), myPos.getZ()));
-				System.out.println(myPos.getX());
-				System.out.println(myPos.getY());
-				System.out.println(myPos.getZ());
 				break;
 		}
 

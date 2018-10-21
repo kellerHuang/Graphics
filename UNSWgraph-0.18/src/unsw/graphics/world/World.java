@@ -78,6 +78,7 @@ public class World extends Application3D implements KeyListener{
 	@Override
 	public void init(GL3 gl) {
 		super.init(gl);
+		gl.glEnable(GL3.GL_POLYGON_OFFSET_FILL);
 		camera.init(gl);
 		getWindow().addKeyListener(camera);
 		getWindow().addKeyListener(this);

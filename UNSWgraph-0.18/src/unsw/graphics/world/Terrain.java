@@ -3,7 +3,6 @@ package unsw.graphics.world;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,9 +10,7 @@ import java.util.List;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.util.GLBuffers;
 
-import sun.font.TrueTypeFont;
 import unsw.graphics.geometry.Point2D;
 import unsw.graphics.geometry.Point3D;
 import unsw.graphics.geometry.TriangleMesh;
@@ -32,6 +29,7 @@ public class Terrain{
     private float[][] altitudes;
     private List<Tree> trees;
     private List<Road> roads;
+    private List<Pond> ponds;
     private Vector3 sunlight;
     private Point3DBuffer vertexBuffer;
     private IntBuffer indicesBuffer;
@@ -55,6 +53,7 @@ public class Terrain{
         altitudes = new float[width][depth];
         trees = new ArrayList<Tree>();
         roads = new ArrayList<Road>();
+        ponds = new ArrayList<Pond>();
         this.sunlight = sunlight;
     }
 
@@ -64,6 +63,9 @@ public class Terrain{
 
     public List<Road> roads() {
         return roads;
+    }
+    public List<Pond> ponds() {
+        return ponds;
     }
 
     public Vector3 getSunlight() {
@@ -157,6 +159,10 @@ public class Terrain{
     public void addRoad(float width, List<Point2D> spine) {
         Road road = new Road(width, spine, altitude(spine.get(0).getX(),spine.get(0).getY()));
         roads.add(road);
+    }
+    public void addPond(float x, float z, float radius) {
+        Pond pond = new Pond(radius,new Point3D(x,altitude(x,z),z));
+        ponds.add(pond);
     }
 
     public List<Point3D> getVertices() {
@@ -266,6 +272,10 @@ public class Terrain{
         for (Road road: roads) {
             road.init(gl);
         }
+
+        for (Pond pond: ponds) {
+            pond.init(gl);
+        }
     }
 
     public void terrainReshape(GL3 gl, int width, int height) {
@@ -297,14 +307,14 @@ public class Terrain{
         Shader.setPenColor(gl, Color.WHITE);
 
         // Test light
-        Shader.setPoint3D(gl, "lightPos", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
+        Shader.setPoint3D(gl, "lightDir", new Point3D(getSunlight().getX(), getSunlight().getY(), getSunlight().getZ()));
         Shader.setColor(gl, "lightIntensity", Color.WHITE);
-        Shader.setColor(gl, "ambientIntensity", new Color(0.75f, 0.75f, 0.75f));
+        Shader.setColor(gl, "ambientIntensity", new Color(0.5f, 0.5f, 0.5f));
 
         Shader.setColor(gl, "ambientCoeff", Color.WHITE);
-        Shader.setColor(gl, "diffuseCoeff", new Color(0.8f, 0.8f, 0.8f));
-        Shader.setColor(gl, "specularCoeff", new Color(0.2f, 0.2f, 0.2f));
-        Shader.setFloat(gl, "phongExp", 4f);
+        Shader.setColor(gl, "diffuseCoeff", new Color(0.5f, 0.5f, 0.5f));
+        Shader.setColor(gl, "specularCoeff", new Color(0.1f, 0.1f, 0.1f));
+        Shader.setFloat(gl, "phongExp", 16f);
 
         Shader.setModelMatrix(gl, frame.getMatrix());
         terrain.draw(gl,frame);
@@ -313,6 +323,9 @@ public class Terrain{
         }
         for (Road road : roads) {
             road.display(gl);
+        }
+        for (Pond pond: ponds) {
+            pond.display(gl);
         }
     }
 }
