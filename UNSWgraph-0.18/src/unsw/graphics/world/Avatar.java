@@ -22,7 +22,7 @@ import unsw.graphics.geometry.Point3D;
  */
 public class Avatar {
 
-    private Point3D myPos;
+    Point3D myPos;
     private float myAngle;
     private float myScale;
     private Camera modelLoc;

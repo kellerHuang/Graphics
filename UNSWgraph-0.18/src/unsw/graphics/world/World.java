@@ -29,6 +29,7 @@ public class World extends Application3D implements KeyListener{
 	private Point3D myPos;
 	private float myAngle;
 	private Boolean thirdPerson = false;
+	private Boolean night = false;
 
 	public World(Terrain terrain) {
 		super("Assignment 2", 800, 600);
@@ -65,7 +66,14 @@ public class World extends Application3D implements KeyListener{
 		}else{
 			camera.setView(gl);
 		}
-		terrain.terrainDisplay(gl,CoordFrame3D.identity());
+
+		if (night) {
+			terrain.terrainDisplay(gl, CoordFrame3D.identity(), avatar.myPos, true);
+		} else {
+			terrain.terrainDisplay(gl, CoordFrame3D.identity(), avatar.myPos, false);
+		}
+
+		//terrain.terrainDisplay(gl,CoordFrame3D.identity());
 	}
 
 	@Override
@@ -102,6 +110,9 @@ public class World extends Application3D implements KeyListener{
 					thirdPerson = true;
 				}
 				System.out.println(thirdPerson);
+				break;
+			case KeyEvent.VK_B:
+				night ^= true;
 				break;
 		}
 

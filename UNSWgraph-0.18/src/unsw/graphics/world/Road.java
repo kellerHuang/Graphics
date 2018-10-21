@@ -1,6 +1,7 @@
 package unsw.graphics.world;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,12 +23,13 @@ public class Road {
 
     private List<Point2D> points;
     private float width;
-    Texture texture;
+    private Texture texture;
     private List<TriangleMesh> meshes = new ArrayList<>();
     private float altitude;
     private int segments = 32;
     private List<Point3D> topRoad;
     private List<Point3D> bottomRoad;
+    private Point3D extra;
 
 
     /**
@@ -44,14 +46,14 @@ public class Road {
         bottomRoad = new ArrayList<>();
     }
 
-    public void display(GL3 gl){
+    public void display(GL3 gl, Vector3 lightDir){
         Shader.setInt (gl, "tex", 0);
         gl.glActiveTexture(GL.GL_TEXTURE0);
         gl.glBindTexture(GL.GL_TEXTURE_2D, texture.getId());
-        Shader.setPenColor(gl, Color.BLACK);
+        Shader.setPenColor(gl, Color.WHITE);
 
         // Test light
-        Shader.setPoint3D(gl, "lightPos", new Point3D(0, 0, 5));
+        Shader.setPoint3D(gl, "lightPos", new Point3D(lightDir.getX(), lightDir.getY(), lightDir.getZ()));
         Shader.setColor(gl, "lightIntensity", Color.WHITE);
         Shader.setColor(gl, "ambientIntensity", new Color(0.3f, 0.3f, 0.3f));
 
@@ -69,14 +71,19 @@ public class Road {
         texture = new Texture(gl, "res/textures/rock.bmp", "bmp", false);
         Shader shader = new Shader(gl, "shaders/vertex_tex_phong.glsl", "shaders/fragment_tex_phong.glsl");
         shader.use(gl);
-        makeExtrusion();
+        for (int i = 0; i < size(); i++) {
+            makeExtrusion(i);
+        }
+
         meshes.add(makeMesh(bottomRoad,topRoad));
         for(TriangleMesh i: meshes){
             i.init(gl);
         }
 
     }
-    private void makeExtrusion() {
+
+
+    private void makeExtrusion(int offset) {
         //The initial shape we're extruding
         List<Point3D> roadControl = new ArrayList<Point3D>();
         List<Point3D> roadPoints = new ArrayList<Point3D>();
@@ -86,12 +93,20 @@ public class Road {
 
 
         float segmentSize = 1.0f/segments;
-
+        if(extra != null){
+            roadPoints.add(extra);
+        }
         for(int i = 0; i<segments; i++){
-            roadPoints.add(new Point3D(point(i*segmentSize).getX(),altitude+0.05f,point(i*segmentSize).getY()));
+            roadPoints.add(new Point3D(point(i*segmentSize + offset).getX(),altitude+0.05f,point(i*segmentSize+offset).getY()));
 
         }
-        //roadPoints.add(new Point3D(point(0.999999f).getX(),altitude+0.01f,point(0.999999f).getY()));
+
+        if(offset < size()-1){
+            extra = roadPoints.get(roadPoints.size()-1);
+            roadPoints.add(new Point3D(point(1+ offset).getX(),altitude+0.05f,point(1+offset).getY()));
+//            extra = new Point3D(point(1+ offset).getX(),altitude+0.05f,point(1+offset).getY());
+        }
+        //roadPoints.add(new Point3D(endPoint(0+offset).getX(),altitude+0.01f,endPoint(0+offset).getY()));
 
         // extrude the top points
 
